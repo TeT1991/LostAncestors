@@ -26,6 +26,5 @@ public class Jumper : MonoBehaviour
     public void SetStatus(bool value)
     {
         _isGrounded = value;
-        Debug.Log(_isGrounded);
     }
 }

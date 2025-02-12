@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent((typeof(Attacker)), (typeof(Mover)), typeof(Jumper))]
@@ -12,6 +13,7 @@ public class Character : MonoBehaviour
     private bool _isGrounded;
 
     private EntityStates _currentState = EntityStates.Idle;
+    private List<StateConditions> _conditions;
 
     private Mover _mover;
     private Jumper _jumper;
@@ -28,7 +30,15 @@ public class Character : MonoBehaviour
         _jumper.Init(GetComponent<Rigidbody2D>(), _jumpPower);
         _attacker.Init(_projectile);
 
-        _collideDetector.CollisionChanged += _jumper.SetStatus;
+        _collideDetector.Collided += _jumper.SetStatus;
+
+        _conditions = new List<StateConditions>
+        {
+            new IdleStateConditions(_collideDetector),
+            new WalkStateConditions(),
+            new JumpStateConditions(_jumper)
+        };
+
     }
 
     private void Update()
@@ -40,28 +50,13 @@ public class Character : MonoBehaviour
 
     private void SwitchState()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && _jumper.IsGrounded || _jumper.IsGrounded == false)
+        foreach (var condition in _conditions)
         {
-            _currentState = EntityStates.Jump;
-            return;
-        }
-
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
-        {
-            _currentState = EntityStates.Walk;
-            return;
-        }
-
-        if((_currentState == EntityStates.Idle || _currentState == EntityStates.Walk) && Input.GetKeyDown(KeyCode.Mouse1))
-        {
-            _currentState = EntityStates.RangeAttack;
-            return;
-        }
-
-        if (!Input.anyKey)
-        {
-            _currentState = EntityStates.Idle;
-            return;
+            if (condition.CanChange(_currentState))
+            {
+                _currentState = condition.Type;
+                return;
+            }
         }
     }
 

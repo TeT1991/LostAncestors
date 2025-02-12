@@ -7,15 +7,15 @@ public class CollideDetector : MonoBehaviour
 {
     private Collider2D _collider;
 
-    public Action<bool> CollisionChanged;
+    public Action<bool> Collided;
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        CollisionChanged?.Invoke(true);
+        Collided?.Invoke(true);
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        CollisionChanged?.Invoke(false);
+        Collided?.Invoke(false);
     }
 }

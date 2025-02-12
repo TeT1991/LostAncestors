@@ -230,6 +230,7 @@ GameObject:
   - component: {fileID: 662407877}
   - component: {fileID: 662407879}
   - component: {fileID: 662407878}
+  - component: {fileID: 662407880}
   m_Layer: 0
   m_Name: Character
   m_TagString: Untagged
@@ -391,6 +392,7 @@ MonoBehaviour:
   _groundSpeed: 0.05
   _airHorizontalSpeed: 0.05
   _jumpPower: 10
+  _projectile: {fileID: 370366244188468717, guid: 5aa56d85217c05a499448d44209358ae, type: 3}
   _textMeshPro: {fileID: 1779034080}
 --- !u!114 &662407877
 MonoBehaviour:
@@ -426,6 +428,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ee8bfc56a103474aa410fb6ff8943cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &662407880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 662407870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11791c3f26527cb47a5cf1768c6ad679, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &664872516
