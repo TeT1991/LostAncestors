@@ -7,7 +7,6 @@ public class JumpStateConditions : StateConditions
     private Jumper _jumper;
     private bool _isJumping;
 
-
     public JumpStateConditions(Jumper jumper)
     {
         _jumper = jumper;

@@ -1,9 +1,10 @@
-public enum EntityStates 
+public enum EntityStates
 {
     Any,
     Idle,
     Walk,
     Jump,
     MeleeAttack,
-    RangeAttack
+    RangeAttack,
+    Patroling
 }

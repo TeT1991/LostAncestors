@@ -1,66 +1,42 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent((typeof(Attacker)), (typeof(Mover)), typeof(Jumper))]
-[RequireComponent((typeof(CollideDetector)),(typeof(Rigidbody2D)))]
-public class Character : MonoBehaviour
+public class Character : Entity
 {
-    [SerializeField] private float _groundSpeed = 1;
-    [SerializeField] private float _airHorizontalSpeed = 1;
-    [SerializeField] private float _jumpPower = 1;
-    [SerializeField] private GameObject _projectile;
-    [SerializeField] private TMPro.TextMeshProUGUI _textMeshPro;
-    private bool _isGrounded;
-
-    private EntityStates _currentState = EntityStates.Idle;
-    private List<StateConditions> _conditions;
-
-    private Mover _mover;
-    private Jumper _jumper;
-    private CollideDetector _collideDetector;
-    private Attacker _attacker;
-
-    private void Awake()
+    protected override void Init()
     {
-        _mover = GetComponent<Mover>();
-        _jumper = GetComponent<Jumper>();
-        _collideDetector = GetComponent<CollideDetector>();
-        _attacker = GetComponent<Attacker>();
+        base.Init();
 
-        _jumper.Init(GetComponent<Rigidbody2D>(), _jumpPower);
-        _attacker.Init(_projectile);
+        Mover = GetComponent<Mover>();
+        Jumper = GetComponent<Jumper>();
+        CollideDetector = GetComponent<CollideDetector>();
+        Attacker = GetComponent<Attacker>();
+        DirectionSwitcher = GetComponent<DirectionSwitcher>();
 
-        _collideDetector.Collided += _jumper.SetStatus;
+        Jumper.Init(GetComponent<Rigidbody2D>(), _jumpPower);
+        Attacker.Init(_projectile, _reloadTime);
 
-        _conditions = new List<StateConditions>
+        CollideDetector.PlatformCollided += Jumper.SetStatus;
+
+        _currentState = EntityStates.Idle;
+
+        Conditions = new List<StateConditions>
         {
-            new IdleStateConditions(_collideDetector),
+            new IdleStateConditions(CollideDetector),
             new WalkStateConditions(),
-            new JumpStateConditions(_jumper)
+            new JumpStateConditions(Jumper),
+            new RangeAttackConditions(Attacker)
         };
-
     }
 
-    private void Update()
+    protected override void Update()
     {
-        SwitchState();
-        ApplyStateActions();
+        base.Update();
         _textMeshPro.text = _currentState.ToString();
+
     }
 
-    private void SwitchState()
-    {
-        foreach (var condition in _conditions)
-        {
-            if (condition.CanChange(_currentState))
-            {
-                _currentState = condition.Type;
-                return;
-            }
-        }
-    }
-
-    private void ApplyStateActions()
+    protected override void ApplyStateActions()
     {
         switch (_currentState)
         {
@@ -81,19 +57,16 @@ public class Character : MonoBehaviour
         }
     }
 
-    private void ApplyWalkStateActions()
+    protected override void ApplyWalkStateActions()
     {
-        _mover.Move(_groundSpeed * Input.GetAxis("Horizontal"));
+        DirectionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
+        Mover.Move(GroundSpeed * DirectionSwitcher.Direction);
     }
 
-    private void ApplyJumpStateActions()
+    protected override void ApplyJumpStateActions()
     {
-        _jumper.Jump();
-        _mover.Move(_airHorizontalSpeed * Input.GetAxis("Horizontal"));
-    }
-
-    private void ApplyRangeAttackStateActions()
-    {
-        _attacker.ApplyRangeAttack();
+        Jumper.Jump();
+        DirectionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
+        Mover.Move(_airHorizontalSpeed * Input.GetAxis("Horizontal"));
     }
 }

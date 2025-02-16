@@ -13,7 +13,7 @@ public class IdleStateConditions : StateConditions
         _allowedStates.Add(EntityStates.Any);
 
         _detector = detector;
-        _detector.Collided += SetIsGroundedStatus;
+        _detector.PlatformCollided += SetIsGroundedStatus;
     }
 
     public override bool CanChange(EntityStates currenState)
@@ -29,6 +29,5 @@ public class IdleStateConditions : StateConditions
     private void SetIsGroundedStatus(bool value)
     {
         _isGrounded = value;
-        Debug.Log(_isGrounded);
     }
 }

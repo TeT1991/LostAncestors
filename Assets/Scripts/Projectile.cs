@@ -1,10 +1,13 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent (typeof(Mover))]
 public class Projectile : MonoBehaviour
 {
-    private float _speed = 0.5f;
+    private float _speed = 5f;
     private Mover _mover;
+    private float _lifeTime = 3f;
+    private Coroutine _coroutine;
 
     private void Start()
     {
@@ -14,10 +17,17 @@ public class Projectile : MonoBehaviour
     public void Init()
     {
         _mover = GetComponent<Mover>();
+        _coroutine = StartCoroutine(Destroy());
     }
 
     private void Update()
     {
         _mover.Move(_speed * Time.deltaTime);
+    }
+
+    private IEnumerator Destroy()
+    {
+        yield return new WaitForSeconds(_lifeTime);
+        Destroy(gameObject);
     }
 }
