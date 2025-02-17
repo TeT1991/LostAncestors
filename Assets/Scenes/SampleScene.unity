@@ -200,7 +200,7 @@ MonoBehaviour:
   GroundSpeed: 5
   _airHorizontalSpeed: 1
   _jumpPower: 1
-  _projectile: {fileID: 0}
+  _projectile: {fileID: 370366244188468717, guid: 5aa56d85217c05a499448d44209358ae, type: 3}
   _reloadTime: 1
   _textMeshPro: {fileID: 2005694984}
   _currentState: 6
@@ -1393,7 +1393,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1846724702
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -25,7 +25,7 @@ public class Character : Entity
             new IdleStateConditions(CollideDetector),
             new WalkStateConditions(),
             new JumpStateConditions(Jumper),
-            new RangeAttackConditions(Attacker)
+            new CharacterRangeAttackConditions(Attacker)
         };
     }
 

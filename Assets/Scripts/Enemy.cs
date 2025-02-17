@@ -30,8 +30,8 @@ public class Enemy : Entity
 
         Conditions = new List<StateConditions>
         {
-            new RangeAttackConditions(Attacker),
-            new PatrolingStateConditions(),
+            new EnemyRangeAttackConditions(Attacker,_characterDetector),
+            new PatrolingStateConditions(_characterDetector),
         };
     }
 

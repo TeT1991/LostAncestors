@@ -6,8 +6,9 @@ public class CharacterDetector : MonoBehaviour
     private Vector2 _direction;
     private Collider2D _collider;
     private float _distance = 3;
+    private bool _isDetected;
 
-    public Action PlayerDetected;
+    public bool IsDetected => _isDetected;
 
     private void Update()
     {
@@ -27,16 +28,24 @@ public class CharacterDetector : MonoBehaviour
 
     private void TryDetectCharacter()
     {
-        Debug.DrawRay(_collider.bounds.center, _direction * _distance, Color.red, Time.deltaTime, false);
-        RaycastHit2D hit = Physics2D.BoxCast(_collider.bounds.center, _collider.bounds.size, transform.eulerAngles.z, _direction, _distance);
+        Debug.DrawRay(_collider.bounds.center, _direction.normalized * _distance, Color.red, Time.deltaTime, false);
+        int indexTocheck = 1;
+        RaycastHit2D[] hits = Physics2D.RaycastAll(_collider.bounds.center, _direction.normalized, _distance, ~0);
 
-        if (hit != false)
+        if (hits.Length > indexTocheck)
         {
-            if (hit.collider.gameObject.TryGetComponent<Character>(out Character character))
+            if (hits[indexTocheck].collider.gameObject.TryGetComponent<Character>(out Character character))
             {
-                Debug.Log("Detected");
-                PlayerDetected?.Invoke();
+                _isDetected = true;
             }
+            else
+            {
+                _isDetected = false;
+            }
+        }
+        else
+        {
+            _isDetected = false;
         }
     }
 }
