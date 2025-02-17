@@ -34,17 +34,15 @@ public class CharacterDetector : MonoBehaviour
 
         if (hits.Length > indexTocheck)
         {
-            if (hits[indexTocheck].collider.gameObject.TryGetComponent<Character>(out Character character))
+            foreach (RaycastHit2D hit in hits)
             {
-                _isDetected = true;
+                if (hit.collider.gameObject.TryGetComponent<Character>(out Character character))
+                {
+                    _isDetected = true;
+                    return;
+                }
             }
-            else
-            {
-                _isDetected = false;
-            }
-        }
-        else
-        {
+
             _isDetected = false;
         }
     }

@@ -22,6 +22,10 @@ public class EnemyRangeAttackConditions : StateConditions
             {
                 return true;
             }
+            if(_attacker.CanAttack == false)
+            {
+                return true;
+            }
         }
         return false;
     }

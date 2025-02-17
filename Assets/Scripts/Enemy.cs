@@ -31,7 +31,7 @@ public class Enemy : Entity
         Conditions = new List<StateConditions>
         {
             new EnemyRangeAttackConditions(Attacker,_characterDetector),
-            new PatrolingStateConditions(_characterDetector),
+            new PatrolingStateConditions(_characterDetector, Attacker),
         };
     }
 

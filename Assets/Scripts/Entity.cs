@@ -7,7 +7,7 @@ public class Entity : MonoBehaviour
     public float _airHorizontalSpeed = 1;
     public float _jumpPower = 1;
     public GameObject _projectile;
-    public float _reloadTime = 1;
+    public float _reloadTime = 5;
 
     public TMPro.TextMeshProUGUI _textMeshPro;
 
