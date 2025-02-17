@@ -18,12 +18,13 @@ public class Attacker : MonoBehaviour
         _attackReload = attackReload;
     }
 
-    public void ApplyRangeAttack()
+    public void ApplyRangeAttack(float direction)
     {
         if (_canAttack)
         {
             var projectile = Instantiate(_projectilePrefab);
             projectile.transform.position = transform.position;
+            projectile.transform.right = transform.right * direction;
             _canAttack = false;
             _rangeAttackCoroutine = StartCoroutine(Reload(_attackReload));
         }

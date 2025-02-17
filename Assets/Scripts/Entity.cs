@@ -108,7 +108,7 @@ public class Entity : MonoBehaviour
 
     protected virtual void ApplyRangeAttackStateActions()
     {
-        Attacker.ApplyRangeAttack();
+        Attacker.ApplyRangeAttack(DirectionSwitcher.Direction);
     }
 
     protected virtual void ApplyPatrolingStateActions()

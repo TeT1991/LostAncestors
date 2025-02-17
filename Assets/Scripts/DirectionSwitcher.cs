@@ -16,8 +16,11 @@ public class DirectionSwitcher : MonoBehaviour
 
     public void SetDirection(float direction)
     {
-        _direction = direction;
-        DirectionChanged?.Invoke(_direction);
+        if (direction != 0)
+        {
+            _direction = direction;
+            DirectionChanged?.Invoke(_direction);
+        }
     }
 
     public void ReverseDirection()

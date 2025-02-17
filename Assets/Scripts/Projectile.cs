@@ -4,7 +4,7 @@ using UnityEngine;
 [RequireComponent (typeof(Mover))]
 public class Projectile : MonoBehaviour
 {
-    private float _speed = 5f;
+    private float _speed = 5;
     private Mover _mover;
     private float _lifeTime = 3f;
     private Coroutine _coroutine;
@@ -22,7 +22,7 @@ public class Projectile : MonoBehaviour
 
     private void Update()
     {
-        _mover.Move(_speed * Time.deltaTime);
+        _mover.Move(_speed );
     }
 
     private IEnumerator Destroy()
