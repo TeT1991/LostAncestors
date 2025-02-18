@@ -7,7 +7,6 @@ public class Enemy : Entity
 {
     private float _groundSpeed;
     private float _reloadTime;
-    private EntityStates _currentState;
     private Transform _projectile;
 
     private Mover _mover;
@@ -31,12 +30,12 @@ public class Enemy : Entity
     protected override void Update()
     {
         base.Update();
-        _textMeshPro.text = _currentState.ToString();
+        _textMeshPro.text = CurrentState.ToString();
     }
 
     protected override void ApplyStateActions()
     {
-        switch (_currentState)
+        switch (CurrentState)
         {
             case EntityStates.Patroling:
                 ApplyPatrolingStateActions();
@@ -62,7 +61,7 @@ public class Enemy : Entity
     {
         _groundSpeed = _config.GroundSpeed;
         _reloadTime = _config.ReloadTime;
-        _currentState = _config.State;
+        CurrentState = _config.State;
         _projectile = _config.Projectile;
     }
 
@@ -73,6 +72,7 @@ public class Enemy : Entity
         _patroler = GetComponent<Patroler>();
         _characterDetector = GetComponent<CharacterDetector>();
         _collideDetector = GetComponent<CollideDetector>();
+        _directionSwitcher = GetComponent<DirectionSwitcher>();
 
         _attacker.Init(_projectile, _reloadTime);
         _directionSwitcher.SetDirection(_config.StartDirection);

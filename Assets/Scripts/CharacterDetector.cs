@@ -29,7 +29,6 @@ public class CharacterDetector : MonoBehaviour
 
     private void TryDetectCharacter()
     {
-        Debug.Log(_direction);
         RaycastHit2D hit = Physics2D.Raycast(_collider.bounds.center, _direction.normalized, _distance);
 
         if (hit != false)

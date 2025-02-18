@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e55a0a27be975f49a509f028d8bbc29, type: 3}
   m_Name: RangeEnemy
   m_EditorClassIdentifier: 
-  _groundSpeed: 0.5
+  _groundSpeed: 5
   _airHorizontalSpeed: 3
   _jumpPower: 10
   _reloadTime: 1
   _startDirection: 1
-  _startState: 1
+  _startState: 6
   _projectile: {fileID: 8618930782057556170, guid: 5aa56d85217c05a499448d44209358ae, type: 3}

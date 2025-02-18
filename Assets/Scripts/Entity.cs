@@ -8,8 +8,10 @@ public class Entity : MonoBehaviour
     public TMPro.TextMeshProUGUI _textMeshPro;
 
     public List<StateConditions> Conditions { get; protected set; }
+    protected EntityStates CurrentState;
 
     private SpriteRenderer _spriteRenderer;
+
 
     private void Awake()
     {
@@ -33,7 +35,18 @@ public class Entity : MonoBehaviour
         };
     }
 
-    protected void SwitchState() { }
+    protected virtual void SwitchState() 
+    {
+        foreach (var condition in Conditions)
+        {
+            if (condition.CanChange(CurrentState))
+            {
+                CurrentState = condition.Type;
+                Debug.Log(CurrentState);
+                return;
+            }
+        }
+    }
     protected virtual void ApplyStateActions() { }
     protected virtual void ApplyWalkStateActions() { }
     protected virtual void ApplyJumpStateActions() { }

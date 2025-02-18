@@ -12,8 +12,9 @@ public class WalkStateConditions : StateConditions
     {
         if (HasAllowedState(currentState))
         {
-            if(Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
+            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
             {
+                Debug.Log("!!!!s");
                 return true;
             }
         }

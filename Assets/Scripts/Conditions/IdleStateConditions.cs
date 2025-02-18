@@ -10,7 +10,9 @@ public class IdleStateConditions : StateConditions
     public IdleStateConditions(CollideDetector detector)
     {
         _stateType = EntityStates.Idle;
-        _allowedStates.Add(EntityStates.Any);
+        _allowedStates.Add(EntityStates.Walk);
+        _allowedStates.Add(EntityStates.Jump);
+        _allowedStates.Add(EntityStates.RangeAttack);
 
         _detector = detector;
         _detector.PlatformCollided += SetIsGroundedStatus;

@@ -9,7 +9,6 @@ public class Character : Entity
     private float _airHorizontalSpeed;
     private float _jumpPower;
     private float _reloadTime;
-    private EntityStates _currentState;
     private Transform _projectile;
 
     private Mover _mover;
@@ -34,12 +33,12 @@ public class Character : Entity
     protected override void Update()
     {
         base.Update();
-        _textMeshPro.text = _currentState.ToString();
+        _textMeshPro.text = CurrentState.ToString();
     }
 
     protected override void ApplyStateActions()
     {
-        switch (_currentState)
+        switch (CurrentState)
         {
             case EntityStates.Idle:
                 break;
@@ -77,7 +76,7 @@ public class Character : Entity
         _airHorizontalSpeed = _config.AirHorizontalSpeed;
         _jumpPower = _config.JumpPower;
         _reloadTime = _config.ReloadTime;
-        _currentState = _config.State;
+        CurrentState = _config.State;
         _projectile = _config.Projectile;
     }
 

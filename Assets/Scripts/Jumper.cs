@@ -8,6 +8,11 @@ public class Jumper : MonoBehaviour
 
     public bool IsGrounded => _isGrounded;
 
+    private void Update()
+    {
+        Debug.Log(_isGrounded);
+    }
+
     public void Init(Rigidbody2D rigidBody, float jumpForce)
     {
         _rigidBody = rigidBody;

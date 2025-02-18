@@ -197,13 +197,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4641e5c78e1ad6f41b1cabe9cb9e951f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GroundSpeed: 5
-  _airHorizontalSpeed: 1
-  _jumpPower: 1
-  _projectile: {fileID: 8618930782057556170, guid: 5aa56d85217c05a499448d44209358ae, type: 3}
-  _reloadTime: 1
+  _config: {fileID: 11400000, guid: d77cd66b6f836d74d9625938570c9c55, type: 2}
   _textMeshPro: {fileID: 2005694984}
-  _currentState: 6
 --- !u!61 &142593470
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -355,7 +350,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5900402d33bc17f45900c03ea0b5dfc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _xDirection: 1
 --- !u!114 &142593475
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -879,13 +873,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e37f08662be0d77459ba6a98432b57cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GroundSpeed: 5
-  _airHorizontalSpeed: 3
-  _jumpPower: 10
-  _projectile: {fileID: 8618930782057556170, guid: 5aa56d85217c05a499448d44209358ae, type: 3}
-  _reloadTime: 1
+  _config: {fileID: 11400000, guid: 8e6ad7d8200f2fe449b7447f86d0a1ef, type: 2}
   _textMeshPro: {fileID: 1779034080}
-  _currentState: 1
 --- !u!114 &662407882
 MonoBehaviour:
   m_ObjectHideFlags: 0
