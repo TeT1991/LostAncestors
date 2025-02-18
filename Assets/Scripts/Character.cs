@@ -72,11 +72,11 @@ public class Character : Entity
 
     protected override void LoadConfig()
     {
+        CurrentState = _config.State;
         _groundSpeed = _config.GroundSpeed;
         _airHorizontalSpeed = _config.AirHorizontalSpeed;
         _jumpPower = _config.JumpPower;
         _reloadTime = _config.ReloadTime;
-        CurrentState = _config.State;
         _projectile = _config.Projectile;
     }
 
