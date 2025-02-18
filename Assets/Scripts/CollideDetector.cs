@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+[RequireComponent(typeof(Collider2D))]
 public class CollideDetector : MonoBehaviour
 {
     private Collider2D _collider;
@@ -28,5 +29,4 @@ public class CollideDetector : MonoBehaviour
     {
         PlatformCollided?.Invoke(false);
     }
-
 }

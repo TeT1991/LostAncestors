@@ -3,16 +3,16 @@ using UnityEngine;
 
 public class Attacker : MonoBehaviour
 {
-    private GameObject _projectilePrefab;
+    private Transform _projectilePrefab;
     private float _attackReload;
     private bool _canAttack = true;
 
-    private Coroutine _rangeAttackCoroutine;
+    private Coroutine _coroutine;
 
     public float AttackReload => _attackReload;
     public bool CanAttack => _canAttack;
 
-    public void Init(GameObject projectile, float attackReload)
+    public void Init(Transform projectile, float attackReload)
     {
         _projectilePrefab = projectile;
         _attackReload = attackReload;
@@ -26,15 +26,13 @@ public class Attacker : MonoBehaviour
             projectile.transform.position = transform.position;
             projectile.transform.right = transform.right * direction;
             _canAttack = false;
-            _rangeAttackCoroutine = StartCoroutine(Reload(_attackReload));
+            _coroutine = StartCoroutine(Reload(_attackReload));
         }
     }
 
     private IEnumerator Reload(float reloadTime)
     {
-        Debug.Log("Reload");
         yield return new WaitForSeconds(reloadTime);
         _canAttack = true;
-        Debug.Log("Reloaded");
     }
 }

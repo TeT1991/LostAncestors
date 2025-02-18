@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class DirectionSwitcher : MonoBehaviour
 {
-    private float _direction = 1;
+    private float _direction;
 
     public float Direction => _direction;
 
@@ -25,8 +25,7 @@ public class DirectionSwitcher : MonoBehaviour
 
     public void ReverseDirection()
     {
-        float directionValue = -1;
-        _direction *= directionValue;
+        _direction = -_direction;
         DirectionChanged?.Invoke(_direction);
     }
 }

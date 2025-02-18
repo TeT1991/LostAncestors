@@ -200,7 +200,7 @@ MonoBehaviour:
   GroundSpeed: 5
   _airHorizontalSpeed: 1
   _jumpPower: 1
-  _projectile: {fileID: 370366244188468717, guid: 5aa56d85217c05a499448d44209358ae, type: 3}
+  _projectile: {fileID: 8618930782057556170, guid: 5aa56d85217c05a499448d44209358ae, type: 3}
   _reloadTime: 1
   _textMeshPro: {fileID: 2005694984}
   _currentState: 6
@@ -882,7 +882,7 @@ MonoBehaviour:
   GroundSpeed: 5
   _airHorizontalSpeed: 3
   _jumpPower: 10
-  _projectile: {fileID: 370366244188468717, guid: 5aa56d85217c05a499448d44209358ae, type: 3}
+  _projectile: {fileID: 8618930782057556170, guid: 5aa56d85217c05a499448d44209358ae, type: 3}
   _reloadTime: 1
   _textMeshPro: {fileID: 1779034080}
   _currentState: 1

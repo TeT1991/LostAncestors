@@ -1,31 +1,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Mover), typeof(Jumper), typeof(Attacker))]
+[RequireComponent(typeof(CollideDetector), typeof(DirectionSwitcher))]
 public class Character : Entity
 {
+    private float _groundSpeed;
+    private float _airHorizontalSpeed;
+    private float _jumpPower;
+    private float _reloadTime;
+    private EntityStates _currentState;
+    private Transform _projectile;
+
+    private Mover _mover;
+    private Jumper _jumper;
+    private Attacker _attacker;
+    private CollideDetector _collideDetector;
+    private DirectionSwitcher _directionSwitcher;
+
     protected override void Init()
     {
         base.Init();
 
-        Mover = GetComponent<Mover>();
-        Jumper = GetComponent<Jumper>();
-        CollideDetector = GetComponent<CollideDetector>();
-        Attacker = GetComponent<Attacker>();
-        DirectionSwitcher = GetComponent<DirectionSwitcher>();
-
-        Jumper.Init(GetComponent<Rigidbody2D>(), _jumpPower);
-        Attacker.Init(_projectile, _reloadTime);
-
-        CollideDetector.PlatformCollided += Jumper.SetStatus;
-
-        _currentState = EntityStates.Idle;
-
         Conditions = new List<StateConditions>
         {
-            new IdleStateConditions(CollideDetector),
+            new IdleStateConditions(_collideDetector),
             new WalkStateConditions(),
-            new JumpStateConditions(Jumper),
-            new CharacterRangeAttackConditions(Attacker)
+            new JumpStateConditions(_jumper),
+            new CharacterRangeAttackConditions(_attacker)
         };
     }
 
@@ -33,7 +35,6 @@ public class Character : Entity
     {
         base.Update();
         _textMeshPro.text = _currentState.ToString();
-
     }
 
     protected override void ApplyStateActions()
@@ -59,14 +60,40 @@ public class Character : Entity
 
     protected override void ApplyWalkStateActions()
     {
-        DirectionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
-        Mover.Move(GroundSpeed * DirectionSwitcher.Direction);
+        _directionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
+        _mover.Move(_groundSpeed * _directionSwitcher.Direction);
     }
 
     protected override void ApplyJumpStateActions()
     {
-        Jumper.Jump();
-        DirectionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
-        Mover.Move(_airHorizontalSpeed * Input.GetAxis("Horizontal"));
+        _jumper.Jump();
+        _directionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
+        _mover.Move(_airHorizontalSpeed * Input.GetAxis("Horizontal"));
+    }
+
+    protected override void LoadConfig()
+    {
+        _groundSpeed = _config.GroundSpeed;
+        _airHorizontalSpeed = _config.AirHorizontalSpeed;
+        _jumpPower = _config.JumpPower;
+        _reloadTime = _config.ReloadTime;
+        _currentState = _config.State;
+        _projectile = _config.Projectile;
+    }
+
+    protected override void InitComponents()
+    {
+        _mover = GetComponent<Mover>();
+        _jumper = GetComponent<Jumper>();
+        _attacker = GetComponent<Attacker>();
+        _collideDetector = GetComponent<CollideDetector>();
+        _directionSwitcher = GetComponent<DirectionSwitcher>();
+
+        _jumper.Init(GetComponent<Rigidbody2D>(), _jumpPower);
+        _attacker.Init(_projectile, _reloadTime);
+        _directionSwitcher.Init(_config.StartDirection);
+
+        _collideDetector.PlatformCollided += _jumper.SetStatus;
     }
 }
+
