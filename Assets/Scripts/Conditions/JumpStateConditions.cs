@@ -20,11 +20,14 @@ public class JumpStateConditions : StateConditions
 
     public override bool CanChange(EntityStates currenState)
     {
-        if (_jumper.IsGrounded && Input.GetKeyDown(KeyCode.Space))
+        if (_allowedStates.Contains(currenState))
         {
-            return true;
-        }
+            if (_jumper.IsGrounded && Input.GetKeyDown(KeyCode.Space))
+            {
+                return true;
+            }
 
+        }
         return false;
     }
 }

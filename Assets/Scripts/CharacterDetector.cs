@@ -6,7 +6,7 @@ public class CharacterDetector : MonoBehaviour
 {
     private Vector2 _direction;
     private Collider2D _collider;
-    private float _distance = 3;
+    private float _distance = 15;
     private bool _isDetected;
 
     public bool IsDetected => _isDetected;

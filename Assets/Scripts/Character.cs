@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Mover), typeof(Jumper), typeof(Attacker))]
-[RequireComponent(typeof(CollideDetector), typeof(DirectionSwitcher))]
+[RequireComponent(typeof(CollideDetector), typeof(DirectionSwitcher), typeof(AnimationSwitcher))]
 public class Character : Entity
 {
     private float _groundSpeed;
@@ -16,6 +16,7 @@ public class Character : Entity
     private Attacker _attacker;
     private CollideDetector _collideDetector;
     private DirectionSwitcher _directionSwitcher;
+    private AnimationSwitcher _animationSwitcher;
 
     protected override void Init()
     {
@@ -33,7 +34,6 @@ public class Character : Entity
     protected override void Update()
     {
         base.Update();
-        _textMeshPro.text = CurrentState.ToString();
     }
 
     protected override void ApplyStateActions()
@@ -41,6 +41,7 @@ public class Character : Entity
         switch (CurrentState)
         {
             case EntityStates.Idle:
+                ApplyIdleActions();
                 break;
 
             case EntityStates.Walk:
@@ -57,10 +58,16 @@ public class Character : Entity
         }
     }
 
+    protected override void ApplyIdleActions()
+    {
+        _animationSwitcher.SetAnimation("Idle", true);
+    }
+
     protected override void ApplyWalkStateActions()
     {
         _directionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
         _mover.Move(_groundSpeed * _directionSwitcher.Direction);
+        _animationSwitcher.SetAnimation("Walk", true);
     }
 
     protected override void ApplyJumpStateActions()
@@ -68,6 +75,15 @@ public class Character : Entity
         _jumper.Jump();
         _directionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
         _mover.Move(_airHorizontalSpeed * Input.GetAxis("Horizontal"));
+   
+        if (_jumper.CurrentVerticalSpeed > 0)
+        {
+            _animationSwitcher.SetAnimation("Jump_up", true);
+        }
+        else
+        {
+            _animationSwitcher.SetAnimation("Jump_down", true);
+        }
     }
 
     protected override void LoadConfig()
@@ -87,11 +103,14 @@ public class Character : Entity
         _attacker = GetComponent<Attacker>();
         _collideDetector = GetComponent<CollideDetector>();
         _directionSwitcher = GetComponent<DirectionSwitcher>();
+        _animationSwitcher = GetComponent<AnimationSwitcher>();
 
         _jumper.Init(GetComponent<Rigidbody2D>(), _jumpPower);
         _attacker.Init(_projectile, _reloadTime);
         _directionSwitcher.Init(_config.StartDirection);
+        _animationSwitcher.Init(_skeletonAnimation);
 
+        _directionSwitcher.DirectionChanged += FlipSprites;
         _collideDetector.PlatformCollided += _jumper.SetStatus;
     }
 }

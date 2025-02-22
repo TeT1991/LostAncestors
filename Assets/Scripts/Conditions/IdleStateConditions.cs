@@ -20,9 +20,12 @@ public class IdleStateConditions : StateConditions
 
     public override bool CanChange(EntityStates currenState)
     {
-        if (Input.anyKey == false && _isGrounded)
+        if (HasAllowedState(currenState))
         {
-            return true;
+            if (Input.anyKey == false && _isGrounded)
+            {
+                return true;
+            }
         }
 
         return false;

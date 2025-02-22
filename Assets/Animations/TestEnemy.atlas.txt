@@ -1,0 +1,6 @@
+TestEnemy.png
+size:396,538
+filter:Linear,Linear
+pma:true
+Enemy
+bounds:2,2,392,534

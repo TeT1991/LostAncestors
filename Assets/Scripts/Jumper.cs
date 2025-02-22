@@ -7,12 +7,7 @@ public class Jumper : MonoBehaviour
     private bool _isGrounded;
 
     public bool IsGrounded => _isGrounded;
-
-    private void Update()
-    {
-        Debug.Log(_isGrounded);
-    }
-
+    public float CurrentVerticalSpeed => _rigidBody.velocity.y;
     public void Init(Rigidbody2D rigidBody, float jumpForce)
     {
         _rigidBody = rigidBody;

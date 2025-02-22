@@ -1,16 +1,15 @@
+using Spine.Unity;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Entity : MonoBehaviour
 {
     [SerializeField] protected EntityConfig _config;
-
-    public TMPro.TextMeshProUGUI _textMeshPro;
+    [SerializeField] protected SkeletonAnimation _skeletonAnimation;
 
     public List<StateConditions> Conditions { get; protected set; }
     protected EntityStates CurrentState;
 
-    private SpriteRenderer _spriteRenderer;
 
 
     private void Awake()
@@ -29,7 +28,6 @@ public class Entity : MonoBehaviour
         LoadConfig();
         InitComponents();
 
-        _spriteRenderer = GetComponent<SpriteRenderer>();
         Conditions = new List<StateConditions>
         {
         };
@@ -42,11 +40,12 @@ public class Entity : MonoBehaviour
             if (condition.CanChange(CurrentState))
             {
                 CurrentState = condition.Type;
-                Debug.Log(CurrentState);
                 return;
             }
         }
     }
+
+    protected virtual void ApplyIdleActions() { }
     protected virtual void ApplyStateActions() { }
     protected virtual void ApplyWalkStateActions() { }
     protected virtual void ApplyJumpStateActions() { }
@@ -57,8 +56,10 @@ public class Entity : MonoBehaviour
 
     protected void FlipSprites(float direction)
     {
-        bool canFlip = (direction <= 0);
-
-        _spriteRenderer.flipX = canFlip;
+        float negativeScale = -1;
+        float positiveScale = 1;
+        float scaleX = direction <= 0 ? negativeScale : positiveScale;
+        Debug.Log(scaleX);
+        _skeletonAnimation.Skeleton.ScaleX = scaleX;
     }
 }
