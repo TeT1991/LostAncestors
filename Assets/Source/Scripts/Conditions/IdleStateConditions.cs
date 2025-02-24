@@ -18,17 +18,11 @@ public class IdleStateConditions : StateConditions
         _detector.PlatformCollided += SetIsGroundedStatus;
     }
 
-    public override bool CanChange(EntityStates currenState)
+    public override bool CanChange(EntityStates currentState)
     {
-        if (HasAllowedState(currenState))
-        {
-            if (Input.anyKey == false && _isGrounded)
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return HasAllowedState(currentState)
+            && _isGrounded
+            && Mathf.Abs(Input.GetAxis("Horizontal")) < 0.1f; // Проверка на "нулевой" ввод
     }
 
     private void SetIsGroundedStatus(bool value)

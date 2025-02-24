@@ -16,17 +16,22 @@ public class CollideDetector : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.TryGetComponent<Platform>(out Platform platform)){
-            PlatformCollided?.Invoke(true);
+        if (collision.gameObject.TryGetComponent<Platform>(out Platform platform))
+        {
+            PlatformCollided?.Invoke(true); // Сообщаем, что персонаж на земле
         }
 
-        if(collision.gameObject.TryGetComponent<Obstacle>(out Obstacle obstacle)){
+        if (collision.gameObject.TryGetComponent<Obstacle>(out Obstacle obstacle))
+        {
             ObstacleCollided?.Invoke();
         }
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        PlatformCollided?.Invoke(false);
+        if (collision.gameObject.TryGetComponent<Platform>(out Platform platform))
+        {
+            PlatformCollided?.Invoke(false); // Персонаж больше не на земле
+        }
     }
 }

@@ -10,7 +10,7 @@ public class Entity : MonoBehaviour
     public List<StateConditions> Conditions { get; protected set; }
     protected EntityStates CurrentState;
 
-
+    private StateMachine _stateMachine;
 
     private void Awake()
     {
@@ -19,14 +19,14 @@ public class Entity : MonoBehaviour
 
     protected virtual void Update()
     {
-        SwitchState();
-        ApplyStateActions();
+        _stateMachine.CurrentState.FrameUpdate();
     }
 
     protected virtual void Init()
     {
         LoadConfig();
         InitComponents();
+        InitStates();
 
         Conditions = new List<StateConditions>
         {
@@ -53,13 +53,16 @@ public class Entity : MonoBehaviour
     protected virtual void ApplyPatrolingStateActions() { }
     protected virtual void LoadConfig() { }
     protected virtual void InitComponents() { }
+    protected virtual void InitStates()
+    {
+        _stateMachine = new StateMachine();
+    }
 
     protected void FlipSprites(float direction)
     {
         float negativeScale = -1;
         float positiveScale = 1;
         float scaleX = direction <= 0 ? negativeScale : positiveScale;
-        Debug.Log(scaleX);
         _skeletonAnimation.Skeleton.ScaleX = scaleX;
     }
 }

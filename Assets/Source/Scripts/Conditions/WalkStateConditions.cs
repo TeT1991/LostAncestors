@@ -14,7 +14,6 @@ public class WalkStateConditions : StateConditions
         {
             if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
             {
-                Debug.Log("!!!!s");
                 return true;
             }
         }

@@ -7,7 +7,7 @@ public class Character : Entity
 {
     private float _groundSpeed;
     private float _airHorizontalSpeed;
-    private float _jumpPower;
+    private float _jumpHeight;
     private float _reloadTime;
     private Transform _projectile;
 
@@ -17,6 +17,11 @@ public class Character : Entity
     private CollideDetector _collideDetector;
     private DirectionSwitcher _directionSwitcher;
     private AnimationSwitcher _animationSwitcher;
+
+    private StateMachine _stateMachine;
+    private IdleState _idleState;
+
+    public TMPro.TextMeshProUGUI _textMeshPro;
 
     protected override void Init()
     {
@@ -75,15 +80,7 @@ public class Character : Entity
         _jumper.Jump();
         _directionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
         _mover.Move(_airHorizontalSpeed * Input.GetAxis("Horizontal"));
-   
-        if (_jumper.CurrentVerticalSpeed > 0)
-        {
-            _animationSwitcher.SetAnimation("Jump_up", true);
-        }
-        else
-        {
-            _animationSwitcher.SetAnimation("Jump_down", true);
-        }
+
     }
 
     protected override void LoadConfig()
@@ -91,7 +88,7 @@ public class Character : Entity
         CurrentState = _config.State;
         _groundSpeed = _config.GroundSpeed;
         _airHorizontalSpeed = _config.AirHorizontalSpeed;
-        _jumpPower = _config.JumpPower;
+        _jumpHeight = _config.JumpPower;
         _reloadTime = _config.ReloadTime;
         _projectile = _config.Projectile;
     }
@@ -105,13 +102,20 @@ public class Character : Entity
         _directionSwitcher = GetComponent<DirectionSwitcher>();
         _animationSwitcher = GetComponent<AnimationSwitcher>();
 
-        _jumper.Init(GetComponent<Rigidbody2D>(), _jumpPower);
+        _jumper.Init(_jumpHeight);
         _attacker.Init(_projectile, _reloadTime);
         _directionSwitcher.Init(_config.StartDirection);
         _animationSwitcher.Init(_skeletonAnimation);
 
         _directionSwitcher.DirectionChanged += FlipSprites;
-        _collideDetector.PlatformCollided += _jumper.SetStatus;
+        // _collideDetector.PlatformCollided += _jumper.SetStatus;
+    }
+
+    protected override void InitStates()
+    {
+        base.InitStates();
+
+        _idleState = new IdleState(this,_stateMachine,_animationSwitcher);
     }
 }
 
