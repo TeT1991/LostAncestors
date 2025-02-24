@@ -1,13 +1,7 @@
-using Spine.Unity;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public class IdleState : EntityState
 {
-    public IdleState(Entity entity, StateMachine stateMachine, AnimationSwitcher animationSwitcher) : base(entity, stateMachine, animationSwitcher)
+    public IdleState(Entity entity, StateMachine stateMachine) : base(entity, stateMachine)
     {
-
     }
 
     public override void Enter()
@@ -15,7 +9,7 @@ public class IdleState : EntityState
         string animationName = "Idle";
 
         base.Enter();
-        AnimationSwitcher.SetAnimation(animationName, true);
+        AnimationSwitcher.TrySetAnimation(animationName, true);
     }
 
     public override void Exit()

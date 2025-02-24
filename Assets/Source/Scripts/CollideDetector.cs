@@ -18,7 +18,7 @@ public class CollideDetector : MonoBehaviour
     {
         if (collision.gameObject.TryGetComponent<Platform>(out Platform platform))
         {
-            PlatformCollided?.Invoke(true); // Сообщаем, что персонаж на земле
+            PlatformCollided?.Invoke(true);
         }
 
         if (collision.gameObject.TryGetComponent<Obstacle>(out Obstacle obstacle))
@@ -31,7 +31,7 @@ public class CollideDetector : MonoBehaviour
     {
         if (collision.gameObject.TryGetComponent<Platform>(out Platform platform))
         {
-            PlatformCollided?.Invoke(false); // Персонаж больше не на земле
+            PlatformCollided?.Invoke(false);
         }
     }
 }

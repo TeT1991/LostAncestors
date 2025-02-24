@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Mover), typeof(Jumper), typeof(Attacker))]
-[RequireComponent(typeof(CollideDetector), typeof(DirectionSwitcher), typeof(AnimationSwitcher))]
+[RequireComponent(typeof(CollideDetector), typeof(DirectionSwitcher), typeof(Rigidbody2D))]
 public class Character : Entity
 {
     private float _groundSpeed;
@@ -16,24 +17,23 @@ public class Character : Entity
     private Attacker _attacker;
     private CollideDetector _collideDetector;
     private DirectionSwitcher _directionSwitcher;
-    private AnimationSwitcher _animationSwitcher;
+    private CharacterStatesHandle _characterStatesSwitchCheck;
 
-    private StateMachine _stateMachine;
-    private IdleState _idleState;
+    private Rigidbody2D _rigidbody2D;
+
+    public float GroundSpeed => _groundSpeed;
+    public float AirHorizontalSpeed => _airHorizontalSpeed; 
+
+    public Mover Mover => _mover;
+    public Jumper Jumper => _jumper;
+    public CollideDetector CollideDetector => _collideDetector;
+    public DirectionSwitcher DirectionSwitcher => _directionSwitcher;
 
     public TMPro.TextMeshProUGUI _textMeshPro;
 
     protected override void Init()
     {
         base.Init();
-
-        Conditions = new List<StateConditions>
-        {
-            new IdleStateConditions(_collideDetector),
-            new WalkStateConditions(),
-            new JumpStateConditions(_jumper),
-            new CharacterRangeAttackConditions(_attacker)
-        };
     }
 
     protected override void Update()
@@ -41,51 +41,8 @@ public class Character : Entity
         base.Update();
     }
 
-    protected override void ApplyStateActions()
-    {
-        switch (CurrentState)
-        {
-            case EntityStates.Idle:
-                ApplyIdleActions();
-                break;
-
-            case EntityStates.Walk:
-                ApplyWalkStateActions();
-                break;
-
-            case EntityStates.Jump:
-                ApplyJumpStateActions();
-                break;
-
-            case EntityStates.RangeAttack:
-                ApplyRangeAttackStateActions();
-                break;
-        }
-    }
-
-    protected override void ApplyIdleActions()
-    {
-        _animationSwitcher.SetAnimation("Idle", true);
-    }
-
-    protected override void ApplyWalkStateActions()
-    {
-        _directionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
-        _mover.Move(_groundSpeed * _directionSwitcher.Direction);
-        _animationSwitcher.SetAnimation("Walk", true);
-    }
-
-    protected override void ApplyJumpStateActions()
-    {
-        _jumper.Jump();
-        _directionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
-        _mover.Move(_airHorizontalSpeed * Input.GetAxis("Horizontal"));
-
-    }
-
     protected override void LoadConfig()
     {
-        CurrentState = _config.State;
         _groundSpeed = _config.GroundSpeed;
         _airHorizontalSpeed = _config.AirHorizontalSpeed;
         _jumpHeight = _config.JumpPower;
@@ -95,27 +52,23 @@ public class Character : Entity
 
     protected override void InitComponents()
     {
+        base.InitComponents();
+
         _mover = GetComponent<Mover>();
         _jumper = GetComponent<Jumper>();
         _attacker = GetComponent<Attacker>();
         _collideDetector = GetComponent<CollideDetector>();
         _directionSwitcher = GetComponent<DirectionSwitcher>();
-        _animationSwitcher = GetComponent<AnimationSwitcher>();
+        _characterStatesSwitchCheck = GetComponent<CharacterStatesHandle>();
+        _rigidbody2D = GetComponent<Rigidbody2D>();
 
-        _jumper.Init(_jumpHeight);
+        _jumper.Init(_jumpHeight, _rigidbody2D);
         _attacker.Init(_projectile, _reloadTime);
         _directionSwitcher.Init(_config.StartDirection);
-        _animationSwitcher.Init(_skeletonAnimation);
+        _characterStatesSwitchCheck.Init(this);
 
         _directionSwitcher.DirectionChanged += FlipSprites;
         // _collideDetector.PlatformCollided += _jumper.SetStatus;
-    }
-
-    protected override void InitStates()
-    {
-        base.InitStates();
-
-        _idleState = new IdleState(this,_stateMachine,_animationSwitcher);
     }
 }
 

@@ -10,9 +10,10 @@ public class AnimationSwitcher : MonoBehaviour
         _skeletonAnimation = skeletonAnimation;
     }
 
-    public void SetAnimation(string animationName, bool isLoop)
+    public void TrySetAnimation(string animationName, bool isLoop)
     {
         int trackIndex = 0;
+
         if (animationName != _skeletonAnimation.AnimationName)
         {
             _skeletonAnimation.state.SetAnimation(trackIndex, animationName, isLoop);

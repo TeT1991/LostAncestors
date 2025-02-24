@@ -9,7 +9,6 @@ public class EntityConfig : ScriptableObject
     [SerializeField] private float _reloadTime;
     [SerializeField] private float _startDirection;
 
-    [SerializeField] private EntityStates _startState;
     [SerializeField] private Transform _projectile;
 
     public float GroundSpeed => _groundSpeed;
@@ -17,6 +16,5 @@ public class EntityConfig : ScriptableObject
     public float JumpPower => _jumpPower;
     public float ReloadTime => _reloadTime;
     public float StartDirection => _startDirection;
-    public EntityStates State => _startState;
     public Transform Projectile => _projectile;
 }
