@@ -4,9 +4,9 @@ using UnityEngine;
 [RequireComponent (typeof(Mover))]
 public class Projectile : MonoBehaviour
 {
-    private float _speed = 5;
+    [SerializeField] private float _speed = 10;
+    [SerializeField] private float _lifeTime = 3f;
     private Mover _mover;
-    private float _lifeTime = 3f;
     private Coroutine _coroutine;
 
     private void Start()

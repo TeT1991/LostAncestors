@@ -24,7 +24,6 @@ public class CharacterStatesHandle : MonoBehaviour
     public void Init(Character character)
     {
         _character = character;
-        _isJumping = false;
 
         _character.CollideDetector.PlatformCollided += SetJumpingStatus;
 
@@ -43,12 +42,23 @@ public class CharacterStatesHandle : MonoBehaviour
     {
         if (_attackConditions.IsConditionsCompleted())
         {
+            string animationName= "RangeAttack";
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                _isAttacking = true;
+                _attackState.SetAttackInfo(_character.MeleeProjectile, _character.ProjectileMeleeLaunchPoint, animationName);
+
+                TryChangeState(_attackState);
+            }
+
             if (Input.GetMouseButtonDown(1))
             {
                 _isAttacking = true;
-               
+                _attackState.SetAttackInfo(_character.RangeProjectile, _character.ProjectileRangeLaunchPoint, animationName);
+
                 TryChangeState(_attackState);
-            }
+            } 
         }
     }
 

@@ -1,6 +1,4 @@
-using Spine;
 using Spine.Unity;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(AnimationSwitcher))]
@@ -30,6 +28,8 @@ public class Entity : MonoBehaviour
     protected virtual void InitComponents()
     {
         _animationSwitcher = GetComponent<AnimationSwitcher>();
+
+        SkeletonAnimation.Initialize(true);
         _animationSwitcher.Init(SkeletonAnimation);
     }
 

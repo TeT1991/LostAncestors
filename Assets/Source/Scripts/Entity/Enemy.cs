@@ -1,9 +1,8 @@
-using Spine;
 using UnityEngine;
 
 [RequireComponent(typeof(Mover), typeof(Attacker), typeof(Patroler))]
 [RequireComponent(typeof(CollideDetector), typeof(DirectionSwitcher), typeof(CharacterDetector))]
-[RequireComponent(typeof(AnimationSwitcher), typeof(EnemyStatesHandle))]
+[RequireComponent(typeof(EnemyStatesHandle))]
 public class Enemy : Entity
 {
     [SerializeField] private Transform _rayStartPoint;
@@ -35,7 +34,7 @@ public class Enemy : Entity
     {
         _groundSpeed = Config.GroundSpeed;
         _reloadTime = Config.ReloadTime;
-        _projectile = Config.Projectile;
+        _projectile = Config.RangeProjectile;
     }
 
     protected override void InitComponents()

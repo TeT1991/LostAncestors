@@ -1,6 +1,6 @@
 public class PatrolingState : EntityState
 {
-    private Enemy _enemy;
+    private readonly Enemy _enemy;
 
     public PatrolingState(Entity entity, StateMachine stateMachine) : base(entity, stateMachine)
     {

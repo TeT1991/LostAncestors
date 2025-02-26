@@ -49,15 +49,12 @@ public class EnemyStatesHandle : MonoBehaviour
     {
         if (_enemy.CharacterDetector.IsDetected == false)
         {
-            Debug.Log("!!!");
             _isAttacking = value;
         }
     }
 
     private void TrySetPatrolingState()
     {
-        Debug.Log(_patrolingConditions.ToString());
-
         if (_patrolingConditions.IsConditionsCompleted())
         {
             if(_enemy.CharacterDetector.IsDetected == false)

@@ -9,12 +9,14 @@ public class EntityConfig : ScriptableObject
     [SerializeField] private float _reloadTime;
     [SerializeField] private float _startDirection;
 
-    [SerializeField] private Transform _projectile;
+    [SerializeField] private Transform _projectileRange;
+    [SerializeField] private Transform _projectileMelee;
 
     public float GroundSpeed => _groundSpeed;
     public float AirHorizontalSpeed => _airHorizontalSpeed;
     public float JumpPower => _jumpPower;
     public float ReloadTime => _reloadTime;
     public float StartDirection => _startDirection;
-    public Transform Projectile => _projectile;
+    public Transform RangeProjectile => _projectileRange;
+    public Transform MeleeProjectile => _projectileMelee;
 }

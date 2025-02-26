@@ -11,10 +11,12 @@ public class AttackCharacterState : EntityState
 
     public override void Enter()
     {
-        string animationName = "RangeAttack";
+        _character.Attacker.ApplyAttack(_character.DirectionSwitcher.Direction);  
+    }
 
-        _character.Attacker.SetProjectile(_character.Projectile, _character.ProjectileLaunchPoint);
-        _character.Attacker.ApplyAttack(_character.DirectionSwitcher.Direction);
+    public void SetAttackInfo(Transform projectile, Transform projectileLaunchPoint, string animationName)
+    {
+        _character.Attacker.SetProjectile(projectile, projectileLaunchPoint);
         _character.AnimationSwitcher.TrySetAnimation(animationName, false);
     }
 }

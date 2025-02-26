@@ -6,13 +6,15 @@ using UnityEngine;
 [RequireComponent(typeof(CollideDetector), typeof(DirectionSwitcher), typeof(Rigidbody2D))]
 public class Character : Entity
 {
-    [SerializeField] private Transform _projectileLaunchPoint;
+    [SerializeField] private Transform _projectileRangeLaunchPoint;
+    [SerializeField] private Transform _projectileMeleeLaunchPoint;
 
     private float _groundSpeed;
     private float _airHorizontalSpeed;
     private float _jumpHeight;
     private float _reloadTime;
-    private Transform _projectile;
+    private Transform _rangeProjectile;
+    private Transform _meleeProjectile;
 
     private Mover _mover;
     private Jumper _jumper;
@@ -25,8 +27,10 @@ public class Character : Entity
 
     public float GroundSpeed => _groundSpeed;
     public float AirHorizontalSpeed => _airHorizontalSpeed; 
-    public Transform Projectile => _projectile;
-    public Transform ProjectileLaunchPoint => _projectileLaunchPoint;
+    public Transform RangeProjectile => _rangeProjectile;
+    public Transform MeleeProjectile => _meleeProjectile;
+    public Transform ProjectileRangeLaunchPoint => _projectileRangeLaunchPoint;
+    public Transform ProjectileMeleeLaunchPoint => _projectileMeleeLaunchPoint;
 
     public Mover Mover => _mover;
     public Jumper Jumper => _jumper;
@@ -42,7 +46,8 @@ public class Character : Entity
         _airHorizontalSpeed = Config.AirHorizontalSpeed;
         _jumpHeight = Config.JumpPower;
         _reloadTime = Config.ReloadTime;
-        _projectile = Config.Projectile;
+        _rangeProjectile = Config.RangeProjectile;
+        _meleeProjectile = Config.MeleeProjectile;
     }
 
     protected override void InitComponents()
