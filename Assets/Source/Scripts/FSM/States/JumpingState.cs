@@ -4,43 +4,28 @@ using UnityEngine;
 
 public class JumpingState : EntityState
 {
-    private Character _character;
-
-    private Mover _mover;
-    private DirectionSwitcher _directionSwitcher;
-    private Jumper _jumper;
-    private float _horizontalSpeed;
+    private readonly Character _entity;
 
     public JumpingState(Entity entity, StateMachine stateMachine) : base(entity, stateMachine)
     {
-        _character = entity as Character;
-        _mover = _character.Mover;
-        _directionSwitcher = _character.DirectionSwitcher;
-        _jumper = _character.Jumper;
+        _entity = entity as Character;
     }
 
     public override void Enter()
     {
-        base.Enter();
-
-        _jumper.Jump();
-    }
-
-    public override void Exit()
-    {
-        base.Exit();
+        _entity.Jumper.Jump();
     }
 
     public override void FrameUpdate()
     {
         base.FrameUpdate();
 
-        _directionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
+        _entity.DirectionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
 
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
         {
-            _character.DirectionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
-            _mover.Move(_character.AirHorizontalSpeed * _character.DirectionSwitcher.Direction);
+            _entity.DirectionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
+            _entity.Mover.Move(_entity.AirHorizontalSpeed * _entity.DirectionSwitcher.Direction);
 
         }
 
@@ -52,13 +37,13 @@ public class JumpingState : EntityState
         string upAnimationName = "Jump_up";
         string downAnimationName = "Jump_down";
 
-        if(_jumper.VerticalSpeed > 0)
+        if(_entity.Jumper.VerticalSpeed > 0)
         {
-            AnimationSwitcher.TrySetAnimation(upAnimationName, true);
+            _entity.AnimationSwitcher.TrySetAnimation(upAnimationName, true);
         }
         else
         {
-            AnimationSwitcher.TrySetAnimation(downAnimationName, true);
+            _entity.AnimationSwitcher.TrySetAnimation(downAnimationName, true);
         }
     }
 }

@@ -18,8 +18,8 @@ public class DirectionSwitcher : MonoBehaviour
     {
         if (direction != 0)
         {
-            DirectionChanged?.Invoke(_direction);
             _direction = direction;
+            DirectionChanged?.Invoke(_direction);
         }
     }
 

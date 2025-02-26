@@ -6,6 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(CollideDetector), typeof(DirectionSwitcher), typeof(Rigidbody2D))]
 public class Character : Entity
 {
+    [SerializeField] private Transform _projectileLaunchPoint;
+
     private float _groundSpeed;
     private float _airHorizontalSpeed;
     private float _jumpHeight;
@@ -23,31 +25,24 @@ public class Character : Entity
 
     public float GroundSpeed => _groundSpeed;
     public float AirHorizontalSpeed => _airHorizontalSpeed; 
+    public Transform Projectile => _projectile;
+    public Transform ProjectileLaunchPoint => _projectileLaunchPoint;
 
     public Mover Mover => _mover;
     public Jumper Jumper => _jumper;
+    public Attacker Attacker => _attacker;
     public CollideDetector CollideDetector => _collideDetector;
     public DirectionSwitcher DirectionSwitcher => _directionSwitcher;
 
     public TMPro.TextMeshProUGUI _textMeshPro;
 
-    protected override void Init()
-    {
-        base.Init();
-    }
-
-    protected override void Update()
-    {
-        base.Update();
-    }
-
     protected override void LoadConfig()
     {
-        _groundSpeed = _config.GroundSpeed;
-        _airHorizontalSpeed = _config.AirHorizontalSpeed;
-        _jumpHeight = _config.JumpPower;
-        _reloadTime = _config.ReloadTime;
-        _projectile = _config.Projectile;
+        _groundSpeed = Config.GroundSpeed;
+        _airHorizontalSpeed = Config.AirHorizontalSpeed;
+        _jumpHeight = Config.JumpPower;
+        _reloadTime = Config.ReloadTime;
+        _projectile = Config.Projectile;
     }
 
     protected override void InitComponents()
@@ -63,12 +58,12 @@ public class Character : Entity
         _rigidbody2D = GetComponent<Rigidbody2D>();
 
         _jumper.Init(_jumpHeight, _rigidbody2D);
-        _attacker.Init(_projectile, _reloadTime);
-        _directionSwitcher.Init(_config.StartDirection);
+        _attacker.Init(_reloadTime);
+        _directionSwitcher.Init(Config.StartDirection);
         _characterStatesSwitchCheck.Init(this);
 
         _directionSwitcher.DirectionChanged += FlipSprites;
-        // _collideDetector.PlatformCollided += _jumper.SetStatus;
+        _attacker.Reloaded += () => _characterStatesSwitchCheck.SetAttackStatus(false);
     }
 }
 

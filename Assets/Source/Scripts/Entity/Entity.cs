@@ -1,3 +1,4 @@
+using Spine;
 using Spine.Unity;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,10 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(AnimationSwitcher))]
 public class Entity : MonoBehaviour
 {
-    [SerializeField] protected EntityConfig _config;
-    [SerializeField] protected SkeletonAnimation _skeletonAnimation;
-
-
+    [SerializeField] protected EntityConfig Config;
+    [SerializeField] protected SkeletonAnimation SkeletonAnimation;
 
     private AnimationSwitcher _animationSwitcher;
 
@@ -20,10 +19,6 @@ public class Entity : MonoBehaviour
         Init();
     }
 
-    protected virtual void Update()
-    {
-    }
-
     protected virtual void Init()
     {
         LoadConfig();
@@ -31,10 +26,11 @@ public class Entity : MonoBehaviour
     }
 
     protected virtual void LoadConfig() { }
+
     protected virtual void InitComponents()
     {
         _animationSwitcher = GetComponent<AnimationSwitcher>();
-        _animationSwitcher.Init(_skeletonAnimation);
+        _animationSwitcher.Init(SkeletonAnimation);
     }
 
     protected void FlipSprites(float direction)
@@ -42,6 +38,6 @@ public class Entity : MonoBehaviour
         float negativeScale = -1;
         float positiveScale = 1;
         float scaleX = direction <= 0 ? negativeScale : positiveScale;
-        _skeletonAnimation.Skeleton.ScaleX = scaleX;
+        SkeletonAnimation.Skeleton.ScaleX = scaleX;
     }
 }

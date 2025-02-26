@@ -1,12 +1,11 @@
-using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
 public class CharacterDetector : MonoBehaviour
 {
+    private Transform _rayStartPoint;
     private Vector2 _direction;
-    private Collider2D _collider;
-    private float _distance = 15;
+    private float _distance;
     private bool _isDetected;
 
     public bool IsDetected => _isDetected;
@@ -16,10 +15,11 @@ public class CharacterDetector : MonoBehaviour
         TryDetectCharacter();
     }
 
-    public void Init(float direction)
+    public void Init(float direction, Transform rayStartPoint)
     {
+        _distance = 10;
+        _rayStartPoint = rayStartPoint;
         SetDirection(direction);
-        _collider = GetComponent<Collider2D>();
     }
 
     public void SetDirection(float direction)
@@ -29,7 +29,8 @@ public class CharacterDetector : MonoBehaviour
 
     private void TryDetectCharacter()
     {
-        RaycastHit2D hit = Physics2D.Raycast(_collider.bounds.center, _direction.normalized, _distance);
+        RaycastHit2D hit = Physics2D.Raycast(_rayStartPoint.position, _direction.normalized, _distance);
+        Debug.DrawRay(_rayStartPoint.position, _direction.normalized * _distance, Color.yellow, Time.deltaTime);
 
         if (hit != false)
         {
@@ -37,11 +38,10 @@ public class CharacterDetector : MonoBehaviour
             {
                 _isDetected = true;
             }
-
-            else
-            {
-                _isDetected = false;
-            }
+        }
+        else
+        {
+            _isDetected = false;
         }
     }
 }

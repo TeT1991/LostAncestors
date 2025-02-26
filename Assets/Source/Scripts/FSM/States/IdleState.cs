@@ -1,24 +1,16 @@
 public class IdleState : EntityState
 {
-    public IdleState(Entity entity, StateMachine stateMachine) : base(entity, stateMachine)
+    private readonly Entity _entity;
+
+    public IdleState(Entity entity, StateMachine stateMachine) : base(entity, stateMachine) 
     {
+        _entity = entity;
     }
 
     public override void Enter()
     {
         string animationName = "Idle";
 
-        base.Enter();
-        AnimationSwitcher.TrySetAnimation(animationName, true);
-    }
-
-    public override void Exit()
-    {
-        base.Exit();
-    }
-
-    public override void FrameUpdate()
-    {
-        base.FrameUpdate();
+        _entity.AnimationSwitcher.TrySetAnimation(animationName, true);
     }
 }

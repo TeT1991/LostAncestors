@@ -1,21 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public class StateMachine 
 {
-    public EntityState CurrentState { get; private set; }
+    private EntityState _currentState;
+
+    public EntityState CurrentState => _currentState;
 
     public void Init(EntityState startingState)
     {
-        CurrentState = startingState;
-        CurrentState.Enter();
+        _currentState = startingState;
+        _currentState.Enter();
     }
 
     public void ChangeState(EntityState newState)
     {
-        CurrentState.Exit();
-        CurrentState = newState;
-        CurrentState.Enter();
+        _currentState.Exit();
+        _currentState = newState;
+        _currentState.Enter();
     }
 }

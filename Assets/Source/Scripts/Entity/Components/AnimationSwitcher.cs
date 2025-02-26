@@ -14,8 +14,9 @@ public class AnimationSwitcher : MonoBehaviour
     {
         int trackIndex = 0;
 
-        if (animationName != _skeletonAnimation.AnimationName)
+        if (animationName != _skeletonAnimation.AnimationName || _skeletonAnimation.state.GetCurrent(trackIndex) == null)
         {
+            Debug.Log(_skeletonAnimation.state);
             _skeletonAnimation.state.SetAnimation(trackIndex, animationName, isLoop);
         }
     }

@@ -1,28 +1,25 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CharacterStatesHandle : MonoBehaviour
 {
-    public TMPro.TextMeshProUGUI m_TextMeshPro;
-
     [SerializeField] private CharacterSwitcher _characterSwitcher;
     private Character _character;
 
     private bool _isIdle = true;
     private bool _isWalking = false;
     private bool _isJumping = false;
+    private bool _isAttacking = false;
 
     private StateMachine _stateMachine;
     private IdleState _idleState;
     private WalkingState _walkingState;
     private JumpingState _jumpingState;
+    private AttackCharacterState _attackState;
 
-    private List<Func<bool>> _idleConditions;
-    private List<Func<bool>> _walkConditions;
-    private List<Func<bool>> _jumpConditions;
-
-    public bool IsWalking => _isWalking;
+    private Conditions _idleConditions;
+    private Conditions _walkConditions;
+    private Conditions _jumpConditions;
+    private Conditions _attackConditions;
 
     public void Init(Character character)
     {
@@ -37,20 +34,37 @@ public class CharacterStatesHandle : MonoBehaviour
 
     private void Update()
     {
-        m_TextMeshPro.text = (_stateMachine.CurrentState).ToString();
-        TrySetIdleState();
-        TrySetWalkintState();
-        TrySetJumpingState();
+        TrySetState();
         ApplyStateActions();
+        UpdateConditions();
+    }
+
+    public void TrySetAttackingState()
+    {
+        if (_attackConditions.IsConditionsCompleted())
+        {
+            if (Input.GetMouseButtonDown(1))
+            {
+                _isAttacking = true;
+               
+                TryChangeState(_attackState);
+            }
+        }
+    }
+
+    public void SetAttackStatus(bool value)
+    {
+        _isAttacking = value;
     }
 
     public void TrySetJumpingState()
     {
-        if (IsConditionsCompleted(_jumpConditions))
+        if (_jumpConditions.IsConditionsCompleted())
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 _isJumping = true;
+
                 TryChangeState(_jumpingState);
             }
         }
@@ -63,7 +77,7 @@ public class CharacterStatesHandle : MonoBehaviour
 
     public void TrySetWalkintState()
     {
-        if (IsConditionsCompleted(_walkConditions))
+        if (_walkConditions.IsConditionsCompleted())
         {
             if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
             {
@@ -82,27 +96,10 @@ public class CharacterStatesHandle : MonoBehaviour
 
     private void TrySetIdleState()
     {
-        if (IsConditionsCompleted(_idleConditions))
+        if (_idleConditions.IsConditionsCompleted())
         {
             TryChangeState(_idleState);
         }
-    }
-
-    private bool IsConditionsCompleted(List<Func<bool>> conditions)
-    {
-        bool conditinsCompleted = false;
-
-        foreach (var condition in conditions)
-        {
-            conditinsCompleted = !condition();
-
-            if (conditinsCompleted == false)
-            {
-                break;
-            }
-        }
-
-        return conditinsCompleted;
     }
 
     private void TryChangeState(EntityState state)
@@ -118,36 +115,30 @@ public class CharacterStatesHandle : MonoBehaviour
         _stateMachine.CurrentState.FrameUpdate();
     }
 
+    private void TrySetState()
+    {
+        TrySetIdleState();
+        TrySetWalkintState();
+        TrySetJumpingState();
+        TrySetAttackingState();
+    }
+
+    private void UpdateConditions()
+    {
+        _idleConditions.UpdateConditionsStatus(_isWalking, _isJumping, _isAttacking);
+        _walkConditions.UpdateConditionsStatus(_isJumping, _isAttacking);
+        _jumpConditions.UpdateConditionsStatus(_isJumping, _isAttacking);
+        _attackConditions.UpdateConditionsStatus(_isAttacking, _isJumping);
+    }
+
     private void InitConditions()
     {
-        InitIdleConditions();
-        InitWalkConditions();
-        InitJumpConditions();
-    }
+        _idleConditions = new Conditions();
+        _walkConditions = new Conditions();
+       _jumpConditions = new Conditions(); 
+        _attackConditions = new Conditions();
 
-    private void InitIdleConditions()
-    {
-        _idleConditions = new()
-        {
-            () => _isWalking,
-            () => _isJumping
-        };
-    }
-
-    private void InitWalkConditions()
-    {
-        _walkConditions = new()
-        {
-            () => _isJumping,
-        };
-    }
-
-    private void InitJumpConditions()
-    {
-        _jumpConditions = new()
-        {
-            () => _isJumping,
-        };
+        UpdateConditions();
     }
 
     private void InitStateMachine()
@@ -156,6 +147,7 @@ public class CharacterStatesHandle : MonoBehaviour
         _idleState = new IdleState(_character, _stateMachine);
         _walkingState = new WalkingState(_character, _stateMachine);
         _jumpingState = new JumpingState(_character, _stateMachine);
+        _attackState = new AttackCharacterState(_character, _stateMachine);
 
         _stateMachine.Init(_idleState);
     }
