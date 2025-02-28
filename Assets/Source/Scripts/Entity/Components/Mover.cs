@@ -1,5 +1,4 @@
 using UnityEngine;
-
 public class Mover : MonoBehaviour
 {
     public void Move(float speed)

@@ -12,12 +12,12 @@ TagManager:
   - Water
   - UI
   - Characters
-  - Platform
+  - Enemy
   - Projectiles
-  - 
-  - 
-  - 
-  - 
+  - Envorinment
+  - Pickables
+  - Platform
+  - Obstacle
   - 
   - 
   - 

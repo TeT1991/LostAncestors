@@ -20,13 +20,14 @@ public class JumpingState : EntityState
     {
         base.FrameUpdate();
 
+        _entity.Jumper.UpdatePosition(); 
+
         _entity.DirectionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
 
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
         {
             _entity.DirectionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
             _entity.Mover.Move(_entity.AirHorizontalSpeed * _entity.DirectionSwitcher.Direction);
-
         }
 
         SetCorrectJumpAnimation();

@@ -4,13 +4,13 @@ public class Patroler : MonoBehaviour
 {
     private float _xDirection;
 
-    private CollideDetector _collideDetector;
+    private EnemyCollideDetector _collideDetector;
 
-    public void Init(CollideDetector collideDetector, float direction)
+    public void Init(EnemyCollideDetector collideDetector, float direction)
     {
         _xDirection = direction;
         _collideDetector = collideDetector;
-        _collideDetector.ObstacleCollided += ReverseDirection;
+        _collideDetector.WallCollided += ReverseDirection;
     }
 
     public void ReverseDirection()

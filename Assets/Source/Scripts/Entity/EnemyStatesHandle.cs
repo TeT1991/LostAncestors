@@ -37,7 +37,7 @@ public class EnemyStatesHandle : MonoBehaviour
     {
         if (_attackingConditions.IsConditionsCompleted())
         {
-            if (_enemy.CharacterDetector.IsDetected == true)
+            if (_enemy.EnemyCollideDetector.IsCharacterDetected == true)
             {
                 _isAttacking = true;
                 TryChangeState(_attackingState);
@@ -47,7 +47,7 @@ public class EnemyStatesHandle : MonoBehaviour
 
     public void SetAttackStatus(bool value)
     {
-        if (_enemy.CharacterDetector.IsDetected == false)
+        if (_enemy.EnemyCollideDetector.IsCharacterDetected == false)
         {
             _isAttacking = value;
         }
@@ -57,7 +57,7 @@ public class EnemyStatesHandle : MonoBehaviour
     {
         if (_patrolingConditions.IsConditionsCompleted())
         {
-            if(_enemy.CharacterDetector.IsDetected == false)
+            if(_enemy.EnemyCollideDetector.IsCharacterDetected == false)
             {
                 _isPatroling = true;
 

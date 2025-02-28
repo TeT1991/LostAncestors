@@ -2,21 +2,31 @@ using UnityEngine;
 
 public class Jumper : MonoBehaviour
 {
+    private float _jumpHeight; 
+    private float _gravity; 
+    private float _verticalVelocity; 
     private bool _isGrounded;
-    private float _jumpHeight;
-    private Rigidbody2D _rigidBody2D;
 
-    public bool IsGrounded => _isGrounded;
-    public float VerticalSpeed => _rigidBody2D.velocity.y;
+    public float VerticalSpeed => _verticalVelocity; 
 
-    public void Init(float jumpHeight, Rigidbody2D rigidbody2D)
+    public void Init(float jumpHeight)
     {
+        _gravity = -9.81f;
         _jumpHeight = jumpHeight;
-        _rigidBody2D = rigidbody2D;
+        _isGrounded = true;
     }
-
     public void Jump()
     {
-        _rigidBody2D.AddForce(Vector2.up * _jumpHeight, ForceMode2D.Impulse);
+        float value = -2f;
+        _verticalVelocity = Mathf.Sqrt(value * _gravity * _jumpHeight);
+        _isGrounded = false;
+    }
+    public void UpdatePosition()
+    {
+        if (_isGrounded == false)
+        {
+            _verticalVelocity += _gravity * Time.deltaTime;
+            transform.Translate(0, _verticalVelocity * Time.deltaTime, 0, Space.World);
+        }
     }
 }
