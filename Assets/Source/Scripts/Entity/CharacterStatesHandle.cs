@@ -5,7 +5,6 @@ public class CharacterStatesHandle : MonoBehaviour
     [SerializeField] private CharacterSwitcher _characterSwitcher;
     private Character _character;
 
-    private bool _isIdle = true;
     private bool _isWalking = false;
     private bool _isJumping = false;
     private bool _isAttacking = false;
@@ -30,6 +29,10 @@ public class CharacterStatesHandle : MonoBehaviour
 
     public void Init(Character character)
     {
+        _isWalking = false;
+        _isJumping = false;
+        _isAttacking = false;
+
         _character = character;
 
         _character.CollideDetector.PlatformCollided += SetJumpingStatus;

@@ -9,26 +9,32 @@ public class EnemyCollideDetector : MonoBehaviour
     private Vector2 _direction;
     private float _viewDistance;
     private bool _isCharacterDetected;
+    private bool _isWallCollided;
 
     private string _characterLayerName;
     private string _platformLayerName;
+    private string _projectileLayerName;
     public bool IsCharacterDetected => _isCharacterDetected;
 
     public Action WallCollided;
+    public Action<int> ProjectileCollided;
 
     private void Update()
     {
         TryDetectCharacter();
         TryDetectObstacleCollision();
+        TryDetectProjectileCollision();
     }
 
     public void Init(float direction, Transform rayStartPoint)
     {
         _characterLayerName = "Characters";
         _platformLayerName = "Platform";
+        _projectileLayerName = "Projectiles";
 
         _viewDistance = 10;
         _rayStartPoint = rayStartPoint;
+        _isWallCollided = false;
         _collider = GetComponent<Collider2D>();
         SetDirection(direction);
     }
@@ -44,7 +50,7 @@ public class EnemyCollideDetector : MonoBehaviour
 
         if (hit != false && hit.collider.TryGetComponent<Character>(out Character character))
         {
-                _isCharacterDetected = true;
+            _isCharacterDetected = true;
         }
         else
         {
@@ -52,15 +58,34 @@ public class EnemyCollideDetector : MonoBehaviour
         }
     }
 
+    private void TryDetectProjectileCollision()
+    {
+        Collider2D[] hits = Physics2D.OverlapBoxAll(_collider.bounds.center, _collider.bounds.size, 0, LayerMask.GetMask(_projectileLayerName));
+
+        if (hits.Length > 0)
+        {
+            foreach (var hit in hits)
+            {
+                if (hit.TryGetComponent<Projectile>(out Projectile projectile))
+                {
+                    if (projectile.OwnerType != OwnerType.Enemy)
+                    {
+                        ProjectileCollided?.Invoke(projectile.Damage);
+                        projectile.Destroy();
+                    }
+                }
+            }
+        }
+    }
+
     private void TryDetectObstacleCollision()
     {
-        float collideOffset = 0.1f;
-        float rayStartXPoint = _collider.bounds.center.x + ((_collider.bounds.size.x / 2) * _direction.x);
-        Vector2 rayStartPoint = new(rayStartXPoint, _collider.bounds.center.y);
+        float detectionOffset = _collider.bounds.extents.x + 0.1f;
+        RaycastHit2D hit = Physics2D.Raycast(_collider.bounds.center, _direction.normalized, detectionOffset, LayerMask.GetMask(_platformLayerName));
 
-        RaycastHit2D hit = Physics2D.Raycast(rayStartPoint, _direction, collideOffset, LayerMask.GetMask(_platformLayerName));
+        Debug.DrawRay(_collider.bounds.center, _direction.normalized * detectionOffset, Color.red, Time.deltaTime);
 
-        if(hit != false)
+        if (hit)
         {
             WallCollided?.Invoke();
         }

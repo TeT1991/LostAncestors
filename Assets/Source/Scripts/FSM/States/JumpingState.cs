@@ -1,36 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class JumpingState : EntityState
 {
-    private readonly Character _entity;
+    private readonly Character _character;
 
     public JumpingState(Entity entity, StateMachine stateMachine) : base(entity, stateMachine)
     {
-        _entity = entity as Character;
+        _character = entity as Character;
     }
 
     public override void Enter()
     {
-        _entity.Jumper.Jump();
+        _character.Jumper.Jump();
     }
 
     public override void FrameUpdate()
     {
         base.FrameUpdate();
 
-        _entity.Jumper.UpdatePosition();
+        _character.Jumper.UpdatePosition();
 
-        _entity.DirectionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
+        _character.DirectionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
 
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
         {
-            _entity.DirectionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
+            _character.DirectionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
 
-            if (_entity.CollideDetector.IsWallCollided == false)
+            if (_character.CollideDetector.IsWallCollided == false)
             {
-                _entity.Mover.Move(_entity.AirHorizontalSpeed * _entity.DirectionSwitcher.Direction);
+                _character.Mover.Move(_character.AirHorizontalSpeed * _character.DirectionSwitcher.Direction);
             }
         }
 
@@ -42,13 +40,13 @@ public class JumpingState : EntityState
         string upAnimationName = "Jump_up";
         string downAnimationName = "Jump_down";
 
-        if (_entity.Jumper.VerticalSpeed > 0)
+        if (_character.Jumper.VerticalSpeed > 0)
         {
-            _entity.AnimationSwitcher.TrySetAnimation(upAnimationName, true);
+            _character.AnimationSwitcher.TrySetAnimation(upAnimationName, true);
         }
         else
         {
-            _entity.AnimationSwitcher.TrySetAnimation(downAnimationName, true);
+            _character.AnimationSwitcher.TrySetAnimation(downAnimationName, true);
         }
     }
 }

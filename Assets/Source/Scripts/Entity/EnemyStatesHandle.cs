@@ -4,8 +4,8 @@ public class EnemyStatesHandle : MonoBehaviour
 {
     private Enemy _enemy;
 
-    private bool _isPatroling = true;
-    private bool _isAttacking = false;
+    private bool _isPatroling;
+    private bool _isAttacking;
 
     private StateMachine _stateMachine;
     private PatrolingState _patrolingState;
@@ -23,10 +23,21 @@ public class EnemyStatesHandle : MonoBehaviour
 
     public void Init(Enemy enemy)
     {
+        _isPatroling = true;
+        _isAttacking = false;
+
         _enemy = enemy;
 
         InitStateMachine();
         InitConditions();
+    }
+
+    public void SetAttackStatus(bool value)
+    {
+        if (_enemy.EnemyCollideDetector.IsCharacterDetected == false)
+        {
+            _isAttacking = value;
+        }
     }
 
     private void TrySetAttackingState()
@@ -41,19 +52,11 @@ public class EnemyStatesHandle : MonoBehaviour
         }
     }
 
-    public void SetAttackStatus(bool value)
-    {
-        if (_enemy.EnemyCollideDetector.IsCharacterDetected == false)
-        {
-            _isAttacking = value;
-        }
-    }
-
     private void TrySetPatrolingState()
     {
         if (_patrolingConditions.IsConditionsCompleted())
         {
-            if(_enemy.EnemyCollideDetector.IsCharacterDetected == false)
+            if (_enemy.EnemyCollideDetector.IsCharacterDetected == false)
             {
                 _isPatroling = true;
 
@@ -97,8 +100,8 @@ public class EnemyStatesHandle : MonoBehaviour
     private void InitStateMachine()
     {
         _stateMachine = new StateMachine();
-        _patrolingState = new PatrolingState(_enemy,_stateMachine);
-        _attackingState = new AttackEnemyState(_enemy,_stateMachine);
+        _patrolingState = new PatrolingState(_enemy, _stateMachine);
+        _attackingState = new AttackEnemyState(_enemy, _stateMachine);
 
         _stateMachine.Init(_patrolingState);
     }

@@ -6,14 +6,15 @@ public class Entity : MonoBehaviour
 {
     [SerializeField] protected EntityConfig Config;
     [SerializeField] protected SkeletonAnimation SkeletonAnimation;
-    protected HealthHandler HealthHandler;
     protected OwnerType OwnerType;
 
     private int _health;
 
     private AnimationSwitcher _animationSwitcher;
+    private HealthHandler _healthHandler;
 
     public AnimationSwitcher AnimationSwitcher => _animationSwitcher;
+    public HealthHandler HealthHandler => _healthHandler;
 
     private void Awake()
     {
@@ -34,9 +35,9 @@ public class Entity : MonoBehaviour
     protected virtual void InitComponents()
     {
         _animationSwitcher = GetComponent<AnimationSwitcher>();
-        HealthHandler = GetComponent<HealthHandler>();
         
         SkeletonAnimation.Initialize(true);
+        _healthHandler = GetComponent<HealthHandler>();
         _animationSwitcher.Init(SkeletonAnimation);
         HealthHandler.Init(_health);
     }

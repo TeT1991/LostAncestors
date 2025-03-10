@@ -20,8 +20,16 @@ public class CharacterCollideDetector : MonoBehaviour
 
     public Action<bool> PlatformCollided;
     public Action ObstacleCollided;
-    public Action<int, OwnerType> ProjectileCollided;
+    public Action<int> ProjectileCollided;
     public Action<Pickable> PickaleCollided;
+
+    private void Update()
+    {
+        TryDetectGroundCollision();
+        TryDetectWallCollision();
+        TryDetectProjectileCollision();
+        TryDetectPickableCollision();
+    }
 
     public void Init(DirectionSwitcher directionSwitcher, float direction)
     {
@@ -34,21 +42,12 @@ public class CharacterCollideDetector : MonoBehaviour
         SetDirection(direction);
     }
 
-    private void Update()
-    {
-        DetectGroundCollision();
-        DetectWallCollision();
-        DetectProjectileCollision();
-        DetectPickableCollision();
-    }
-
     public void SetDirection(float direction)
     {
         _direction = (Vector2.right * direction).normalized;
     }
 
-
-    private void DetectGroundCollision()
+    private void TryDetectGroundCollision()
     {
         float detectionOffset = 0.1f;
         Collider2D[] hits = Physics2D.OverlapPointAll(_collider.bounds.min - new Vector3(0, detectionOffset), LayerMask.GetMask(_platformLayerName)); ;
@@ -76,7 +75,7 @@ public class CharacterCollideDetector : MonoBehaviour
         }
     }
 
-    private void DetectWallCollision()
+    private void TryDetectWallCollision()
     {
         float detectionOffset = _collider.bounds.extents.x + 0.1f;
 
@@ -92,10 +91,9 @@ public class CharacterCollideDetector : MonoBehaviour
         {
             _isWallCollided = false;
         }
-        
     }
 
-    private void DetectProjectileCollision()
+    private void TryDetectProjectileCollision()
     {
         Collider2D[] hits = Physics2D.OverlapBoxAll(_collider.bounds.center, _collider.bounds.size, 0, LayerMask.GetMask(_projectileLayerName));
 
@@ -105,13 +103,17 @@ public class CharacterCollideDetector : MonoBehaviour
             {
                 if (hit.TryGetComponent<Projectile>(out Projectile projectile))
                 {
-                    ProjectileCollided?.Invoke(projectile.Damage, projectile.OwnerType);
+                    if (projectile.OwnerType != OwnerType.Character)
+                    {
+                        ProjectileCollided?.Invoke(projectile.Damage);
+                        projectile.Destroy();
+                    }
                 }
             }
         }
     }
 
-    private void DetectPickableCollision()
+    private void TryDetectPickableCollision()
     {
         Collider2D[] hits = Physics2D.OverlapBoxAll(_collider.bounds.center, _collider.bounds.size, 0, LayerMask.GetMask(_pickablesLayerName));
 

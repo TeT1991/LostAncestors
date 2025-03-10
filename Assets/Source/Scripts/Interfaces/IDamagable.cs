@@ -1,4 +1,4 @@
 public interface IDamagable
 {
-    public void TryApplyDamage(int value, OwnerType ownerType);
+    public void ApplyDamage(int value);
 }

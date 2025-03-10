@@ -36,6 +36,11 @@ public class Projectile : MonoBehaviour
         _mover.Move(_speed);
     }
 
+    public void Destroy()
+    {
+        Destroy(gameObject);
+    }
+
     private IEnumerator DestroyByTime()
     {
         yield return new WaitForSeconds(_lifeTime);
@@ -48,7 +53,6 @@ public class Projectile : MonoBehaviour
 
         if (hits.Length > 0)
         {
-            Debug.Log("!!!!");
             Destroy(gameObject);
         }
     }

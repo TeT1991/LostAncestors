@@ -2,7 +2,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(Mover), typeof(Attacker))]
 [RequireComponent(typeof(EnemyStatesHandle), typeof(DirectionSwitcher), typeof(EnemyCollideDetector))]
-public class Enemy : Entity
+public class Enemy : Entity, IDamagable
 {
     [SerializeField] private Transform _rayStartPoint;
     [SerializeField] private Transform _projectileLaunchPoint;
@@ -53,7 +53,24 @@ public class Enemy : Entity
 
         _directionSwitcher.DirectionChanged += _enemyCollideDetector.SetDirection;
         _enemyCollideDetector.WallCollided += _directionSwitcher.ReverseDirection;
+        _enemyCollideDetector.ProjectileCollided += ApplyDamage;
 
         _attacker.Reloaded += () => _enemyStatesHandle.SetAttackStatus(false);
+    }
+
+    public void ApplyDamage(int value)
+    {
+        HealthHandler.ApplyDamage(value);
+    }
+
+    private void OnDestroy()
+    {
+        _directionSwitcher.DirectionChanged -= FlipSprites;
+
+        _directionSwitcher.DirectionChanged += _enemyCollideDetector.SetDirection;
+        _enemyCollideDetector.WallCollided -= _directionSwitcher.ReverseDirection;
+        _enemyCollideDetector.ProjectileCollided -= ApplyDamage;
+
+        _attacker.Reloaded -= () => _enemyStatesHandle.SetAttackStatus(false);
     }
 }
