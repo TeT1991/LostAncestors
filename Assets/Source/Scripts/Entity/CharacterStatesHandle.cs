@@ -21,6 +21,13 @@ public class CharacterStatesHandle : MonoBehaviour
     private Conditions _jumpConditions;
     private Conditions _attackConditions;
 
+    private void Update()
+    {
+        TrySetState();
+        ApplyStateActions();
+        UpdateConditions();
+    }
+
     public void Init(Character character)
     {
         _character = character;
@@ -31,18 +38,21 @@ public class CharacterStatesHandle : MonoBehaviour
         InitConditions();
     }
 
-    private void Update()
+    public void SetJumpingStatus(bool value)
     {
-        TrySetState();
-        ApplyStateActions();
-        UpdateConditions();
+        _isJumping = !value;
     }
 
-    public void TrySetAttackingState()
+    public void SetAttackStatus(bool value)
+    {
+        _isAttacking = value;
+    }
+
+    private void TrySetAttackingState()
     {
         if (_attackConditions.IsConditionsCompleted())
         {
-            string animationName= "RangeAttack";
+            string animationName = "RangeAttack";
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -58,16 +68,11 @@ public class CharacterStatesHandle : MonoBehaviour
                 _attackState.SetAttackInfo(_character.RangeProjectile, _character.ProjectileRangeLaunchPoint, animationName);
 
                 TryChangeState(_attackState);
-            } 
+            }
         }
     }
 
-    public void SetAttackStatus(bool value)
-    {
-        _isAttacking = value;
-    }
-
-    public void TrySetJumpingState()
+    private void TrySetJumpingState()
     {
         if (_jumpConditions.IsConditionsCompleted())
         {
@@ -80,12 +85,7 @@ public class CharacterStatesHandle : MonoBehaviour
         }
     }
 
-    public void SetJumpingStatus(bool value)
-    {
-        _isJumping = !value;
-    }
-
-    public void TrySetWalkintState()
+    private void TrySetWalkintState()
     {
         if (_walkConditions.IsConditionsCompleted())
         {
@@ -145,7 +145,7 @@ public class CharacterStatesHandle : MonoBehaviour
     {
         _idleConditions = new Conditions();
         _walkConditions = new Conditions();
-       _jumpConditions = new Conditions(); 
+        _jumpConditions = new Conditions();
         _attackConditions = new Conditions();
 
         UpdateConditions();

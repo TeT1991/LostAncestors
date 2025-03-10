@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewCharacterConfig", menuName = "Configs/Character Config")]
+[CreateAssetMenu(fileName = "NewEntityConfig", menuName = "Configs/Entity Config")]
 public class EntityConfig : ScriptableObject
 {
     [SerializeField] private int _health;
@@ -11,8 +11,8 @@ public class EntityConfig : ScriptableObject
     [SerializeField] private float _reloadTime;
     [SerializeField] private float _startDirection;
 
-    [SerializeField] private Transform _projectileRange;
-    [SerializeField] private Transform _projectileMelee;
+    [SerializeField] private Projectile _projectileRange;
+    [SerializeField] private Projectile _projectileMelee;
 
     public int Health => _health;
     public float GroundSpeed => _groundSpeed;
@@ -20,6 +20,6 @@ public class EntityConfig : ScriptableObject
     public float JumpPower => _jumpPower;
     public float ReloadTime => _reloadTime;
     public float StartDirection => _startDirection;
-    public Transform RangeProjectile => _projectileRange;
-    public Transform MeleeProjectile => _projectileMelee;
+    public Projectile RangeProjectile => _projectileRange;
+    public Projectile MeleeProjectile => _projectileMelee;
 }

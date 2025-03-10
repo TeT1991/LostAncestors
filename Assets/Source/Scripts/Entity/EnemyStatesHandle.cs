@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class EnemyStatesHandle : MonoBehaviour
 {
-    public TMPro.TextMeshProUGUI text;
-
     private Enemy _enemy;
 
     private bool _isPatroling = true;
@@ -21,8 +19,6 @@ public class EnemyStatesHandle : MonoBehaviour
         TrySetState();
         ApplyStateActions();
         UpdateConditions();
-
-        text.text = _stateMachine.CurrentState.ToString();  
     }
 
     public void Init(Enemy enemy)

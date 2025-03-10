@@ -44,12 +44,10 @@ public class EnemyCollideDetector : MonoBehaviour
 
         if (hit != false && hit.collider.TryGetComponent<Character>(out Character character))
         {
-            Debug.Log("t");
                 _isCharacterDetected = true;
         }
         else
         {
-            Debug.Log("f");
             _isCharacterDetected = false;
         }
     }

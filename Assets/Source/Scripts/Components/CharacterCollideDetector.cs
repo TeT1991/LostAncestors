@@ -8,31 +8,47 @@ public class CharacterCollideDetector : MonoBehaviour
     private string _platformLayerName;
     private string _pickablesLayerName;
 
+    private Vector2 _direction;
+
     private Collider2D _collider;
+    private DirectionSwitcher _directionSwitcher;
 
     private bool _isPlatformCollided;
+    private bool _isWallCollided;
+
+    public bool IsWallCollided => _isWallCollided;
 
     public Action<bool> PlatformCollided;
     public Action ObstacleCollided;
     public Action<int, OwnerType> ProjectileCollided;
     public Action<Pickable> PickaleCollided;
 
-    private void Start()
+    public void Init(DirectionSwitcher directionSwitcher, float direction)
     {
         _collider = GetComponent<Collider2D>();
+        _directionSwitcher = directionSwitcher;
         _projectileLayerName = "Projectiles";
         _platformLayerName = "Platform";
         _pickablesLayerName = "Pickables";
+
+        SetDirection(direction);
     }
 
     private void Update()
     {
-        DetectPlatformCollision();
+        DetectGroundCollision();
+        DetectWallCollision();
         DetectProjectileCollision();
         DetectPickableCollision();
     }
 
-    private void DetectPlatformCollision()
+    public void SetDirection(float direction)
+    {
+        _direction = (Vector2.right * direction).normalized;
+    }
+
+
+    private void DetectGroundCollision()
     {
         float detectionOffset = 0.1f;
         Collider2D[] hits = Physics2D.OverlapPointAll(_collider.bounds.min - new Vector3(0, detectionOffset), LayerMask.GetMask(_platformLayerName)); ;
@@ -58,6 +74,25 @@ public class CharacterCollideDetector : MonoBehaviour
             _isPlatformCollided = isPlatformCollided;
             PlatformCollided?.Invoke(_isPlatformCollided);
         }
+    }
+
+    private void DetectWallCollision()
+    {
+        float detectionOffset = _collider.bounds.extents.x + 0.1f;
+
+        RaycastHit2D hit = Physics2D.Raycast(_collider.bounds.center, _direction.normalized, detectionOffset, LayerMask.GetMask(_platformLayerName));
+
+        Debug.DrawRay(_collider.bounds.center, _direction.normalized * detectionOffset, Color.red, Time.deltaTime);
+
+        if (hit)
+        {
+            _isWallCollided = true;
+        }
+        else
+        {
+            _isWallCollided = false;
+        }
+        
     }
 
     private void DetectProjectileCollision()

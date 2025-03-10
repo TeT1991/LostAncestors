@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Mover), typeof(Jumper), typeof(Attacker))]
-[RequireComponent(typeof(CharacterCollideDetector), typeof(DirectionSwitcher))]
+[RequireComponent(typeof(CharacterCollideDetector), typeof(DirectionSwitcher), typeof(CharacterStatesHandle))]
 public class Character : Entity, IDamagable
 {
     [SerializeField] private Transform _projectileRangeLaunchPoint;
@@ -11,8 +11,8 @@ public class Character : Entity, IDamagable
     private float _airHorizontalSpeed;
     private float _jumpHeight;
     private float _reloadTime;
-    private Transform _rangeProjectile;
-    private Transform _meleeProjectile;
+    private Projectile _rangeProjectile;
+    private Projectile _meleeProjectile;
 
     private Mover _mover;
     private Jumper _jumper;
@@ -25,8 +25,8 @@ public class Character : Entity, IDamagable
 
     public float GroundSpeed => _groundSpeed;
     public float AirHorizontalSpeed => _airHorizontalSpeed;
-    public Transform RangeProjectile => _rangeProjectile;
-    public Transform MeleeProjectile => _meleeProjectile;
+    public Projectile RangeProjectile => _rangeProjectile;
+    public Projectile MeleeProjectile => _meleeProjectile;
     public Transform ProjectileRangeLaunchPoint => _projectileRangeLaunchPoint;
     public Transform ProjectileMeleeLaunchPoint => _projectileMeleeLaunchPoint;
 
@@ -35,8 +35,6 @@ public class Character : Entity, IDamagable
     public Attacker Attacker => _attacker;
     public CharacterCollideDetector CollideDetector => _collideDetector;
     public DirectionSwitcher DirectionSwitcher => _directionSwitcher;
-
-    public TMPro.TextMeshProUGUI _textMeshPro;
 
     protected override void LoadConfig()
     {
@@ -57,14 +55,14 @@ public class Character : Entity, IDamagable
         _mover = GetComponent<Mover>();
         _jumper = GetComponent<Jumper>();
         _attacker = GetComponent<Attacker>();
-        _collideDetector = GetComponent<CharacterCollideDetector>();
         _directionSwitcher = GetComponent<DirectionSwitcher>();
+        _collideDetector = GetComponent<CharacterCollideDetector>();
         _characterStatesSwitchCheck = GetComponent<CharacterStatesHandle>();
-        _rigidbody2D = GetComponent<Rigidbody2D>();
 
         _jumper.Init(_jumpHeight);
         _attacker.Init(_reloadTime);
         _directionSwitcher.Init(Config.StartDirection);
+        _collideDetector.Init(_directionSwitcher, _directionSwitcher.Direction);
         _characterStatesSwitchCheck.Init(this);
 
         _collideDetector.PlatformCollided += _characterStatesSwitchCheck.SetJumpingStatus;
@@ -72,6 +70,7 @@ public class Character : Entity, IDamagable
         _collideDetector.PickaleCollided += TryPickUp;
 
         _directionSwitcher.DirectionChanged += FlipSprites;
+        _directionSwitcher.DirectionChanged += _collideDetector.SetDirection;
         _attacker.Reloaded += () => _characterStatesSwitchCheck.SetAttackStatus(false);
 
         OwnerType = OwnerType.Character;

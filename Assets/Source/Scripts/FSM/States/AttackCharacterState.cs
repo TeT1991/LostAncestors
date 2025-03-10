@@ -14,7 +14,7 @@ public class AttackCharacterState : EntityState
         _character.Attacker.ApplyAttack(_character.DirectionSwitcher.Direction);  
     }
 
-    public void SetAttackInfo(Transform projectile, Transform projectileLaunchPoint, string animationName)
+    public void SetAttackInfo(Projectile projectile, Transform projectileLaunchPoint, string animationName)
     {
         _character.Attacker.SetProjectile(projectile, projectileLaunchPoint);
         _character.AnimationSwitcher.TrySetAnimation(animationName, false);

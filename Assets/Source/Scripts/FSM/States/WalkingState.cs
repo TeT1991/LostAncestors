@@ -1,9 +1,9 @@
 public class WalkingState : EntityState
 {
-    private Character _entity;
+    private readonly Character _entity;
 
-    private Mover _mover;
-    private DirectionSwitcher _directionSwitcher;
+    private readonly Mover _mover;
+    private readonly DirectionSwitcher _directionSwitcher;
 
     public WalkingState(Entity entity, StateMachine stateMachine) : base(entity, stateMachine)
     {
@@ -21,6 +21,20 @@ public class WalkingState : EntityState
     public override void FrameUpdate()
     {
         base.FrameUpdate();
-        _mover.Move(_entity.GroundSpeed * _directionSwitcher.Direction);
+
+        string animationName = "Walk";
+
+        if (_entity.CollideDetector.IsWallCollided)
+        {
+            animationName = "Idle";
+
+            _entity.AnimationSwitcher.TrySetAnimation(animationName, true);
+        }
+        else
+        {
+            animationName = "Walk";
+            _entity.AnimationSwitcher.TrySetAnimation(animationName, true);
+            _mover.Move(_entity.GroundSpeed * _directionSwitcher.Direction);
+        }
     }
 }

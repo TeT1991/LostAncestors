@@ -6,7 +6,7 @@ public class Attacker : MonoBehaviour
 {
     private float _attackReload;
     private bool _canAttack;
-    private Transform _projectile;
+    private Projectile _projectile;
     private Transform _launchPoint;
 
     private Coroutine _coroutine;
@@ -34,7 +34,7 @@ public class Attacker : MonoBehaviour
         }
     }
 
-    public void SetProjectile(Transform projectile, Transform launchPoint)
+    public void SetProjectile(Projectile projectile, Transform launchPoint)
     {
         _projectile = projectile;
         _launchPoint = launchPoint;

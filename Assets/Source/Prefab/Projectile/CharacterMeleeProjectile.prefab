@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5741701072967087653}
   - component: {fileID: 6663885701924662529}
   m_Layer: 2
-  m_Name: TestMeleeProjectile
+  m_Name: CharacterMeleeProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
