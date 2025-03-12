@@ -1,7 +1,6 @@
 using Spine.Unity;
 using UnityEngine;
 
-[RequireComponent(typeof(AnimationSwitcher), typeof(HealthHandler))]
 public class Entity : MonoBehaviour
 {
     [SerializeField] protected EntityConfig Config;
@@ -27,19 +26,21 @@ public class Entity : MonoBehaviour
         InitComponents();
     }
 
-    protected virtual void LoadConfig() 
+    protected virtual void LoadConfig()
     {
         _health = Config.Health;
     }
 
     protected virtual void InitComponents()
     {
-        _animationSwitcher = GetComponent<AnimationSwitcher>();
-        
+        _animationSwitcher = new AnimationSwitcher();
+        _healthHandler = new HealthHandler();
+
         SkeletonAnimation.Initialize(true);
-        _healthHandler = GetComponent<HealthHandler>();
         _animationSwitcher.Init(SkeletonAnimation);
         HealthHandler.Init(_health);
+
+        _healthHandler.Died += Destroy;
     }
 
     protected void FlipSprites(float direction)
@@ -48,5 +49,15 @@ public class Entity : MonoBehaviour
         float positiveScale = 1;
         float scaleX = direction <= 0 ? negativeScale : positiveScale;
         SkeletonAnimation.Skeleton.ScaleX = scaleX;
+    }
+
+    protected void Destroy()
+    {
+        Destroy(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        _healthHandler.Died -= Destroy;
     }
 }

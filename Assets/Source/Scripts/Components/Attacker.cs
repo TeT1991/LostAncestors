@@ -4,21 +4,19 @@ using UnityEngine;
 
 public class Attacker : MonoBehaviour
 {
-    private float _attackReload;
+    private float _attackReloadTime;
     private bool _canAttack;
     private Projectile _projectile;
     private Transform _launchPoint;
 
     private Coroutine _coroutine;
-
-    public float AttackReload => _attackReload;
-    public bool CanAttack => _canAttack;
+    private WaitForSeconds _reload;
 
     public Action Reloaded;
 
-    public void Init(float attackReload)
+    public void Init(float attackReloadTime)
     {
-        _attackReload = attackReload;
+        _reload = new WaitForSeconds(attackReloadTime);
         _canAttack = true;
     }
 
@@ -30,7 +28,7 @@ public class Attacker : MonoBehaviour
             projectile.transform.position = _launchPoint.position;
             projectile.transform.right = transform.right * direction;
             _canAttack = false;
-            _coroutine = StartCoroutine(Reload(_attackReload));
+            _coroutine = StartCoroutine(Reload(_attackReloadTime));
         }
     }
 
@@ -42,7 +40,7 @@ public class Attacker : MonoBehaviour
 
     private IEnumerator Reload(float reloadTime)
     {
-        yield return new WaitForSeconds(reloadTime);
+        yield return _reload;
         Reloaded?.Invoke();   
         _canAttack = true;
     }

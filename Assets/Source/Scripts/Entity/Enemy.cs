@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Mover), typeof(Attacker))]
-[RequireComponent(typeof(EnemyStatesHandle), typeof(DirectionSwitcher), typeof(EnemyCollideDetector))]
+[RequireComponent(typeof(EnemyStatesHandle), typeof(EnemyCollideDetector))]
 public class Enemy : Entity, IDamagable
 {
     [SerializeField] private Transform _rayStartPoint;
@@ -41,8 +41,8 @@ public class Enemy : Entity, IDamagable
         _mover = GetComponent<Mover>();
         _attacker = GetComponent<Attacker>();
         _enemyCollideDetector = GetComponent<EnemyCollideDetector>();
-        _directionSwitcher = GetComponent<DirectionSwitcher>();
         _enemyStatesHandle = GetComponent<EnemyStatesHandle>();
+        _directionSwitcher = new DirectionSwitcher();
 
         _attacker.Init(_reloadTime);
         _directionSwitcher.SetDirection(Config.StartDirection);

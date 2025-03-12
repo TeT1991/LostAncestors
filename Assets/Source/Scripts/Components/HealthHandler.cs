@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class HealthHandler : MonoBehaviour
+public class HealthHandler 
 {
     private int _maxHealth;
     public int _health;
@@ -25,7 +25,6 @@ public class HealthHandler : MonoBehaviour
             if(_health <= 0)
             {
                 Died?.Invoke();
-                Destroy(gameObject);
             }
         }
     }

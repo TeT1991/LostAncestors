@@ -1,13 +1,11 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Mover), typeof(Jumper), typeof(Attacker))]
-[RequireComponent(typeof(CharacterCollideDetector), typeof(DirectionSwitcher), typeof(CharacterStatesHandle))]
+[RequireComponent(typeof(CharacterCollideDetector), typeof(CharacterStatesHandle))]
 public class Character : Entity, IDamagable
 {
     [SerializeField] private Transform _projectileRangeLaunchPoint;
     [SerializeField] private Transform _projectileMeleeLaunchPoint;
-
-    private readonly Rigidbody2D _rigidbody2D;
 
     private float _groundSpeed;
     private float _airHorizontalSpeed;
@@ -56,9 +54,10 @@ public class Character : Entity, IDamagable
         _mover = GetComponent<Mover>();
         _jumper = GetComponent<Jumper>();
         _attacker = GetComponent<Attacker>();
-        _directionSwitcher = GetComponent<DirectionSwitcher>();
         _collideDetector = GetComponent<CharacterCollideDetector>();
         _characterStatesSwitchCheck = GetComponent<CharacterStatesHandle>();
+
+        _directionSwitcher = new DirectionSwitcher();
 
         _jumper.Init(_jumpHeight);
         _attacker.Init(_reloadTime);

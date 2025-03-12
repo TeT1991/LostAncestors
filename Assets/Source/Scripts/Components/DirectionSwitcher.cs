@@ -1,7 +1,6 @@
 using System;
-using UnityEngine;
 
-public class DirectionSwitcher : MonoBehaviour
+public class DirectionSwitcher 
 {
     private float _direction;
 

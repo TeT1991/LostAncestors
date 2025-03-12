@@ -1,7 +1,6 @@
 using Spine.Unity;
-using UnityEngine;
 
-public class AnimationSwitcher : MonoBehaviour
+public class AnimationSwitcher 
 {
     private SkeletonAnimation _skeletonAnimation;
 
