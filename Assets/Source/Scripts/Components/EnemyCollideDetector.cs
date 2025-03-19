@@ -6,6 +6,7 @@ public class EnemyCollideDetector : MonoBehaviour
 {
     private Collider2D _collider;
     private Transform _rayStartPoint;
+
     private Vector2 _direction;
     private float _viewDistance;
     private bool _isCharacterDetected;
