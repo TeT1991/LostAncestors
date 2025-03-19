@@ -25,9 +25,14 @@ public class Character : Entity, IDamagable
     private DirectionSwitcher _directionSwitcher;
     private CharacterStatesHandle _characterStatesSwitchCheck;
 
+<<<<<<< HEAD
     private Rigidbody2D _rigidBody;
 
     private IInteractable _currentInteractable;
+=======
+    private IInteractable _currentInteractable;
+
+>>>>>>> b9303f46096a31d8213b5436b541e36359e917f9
 
     public float GroundSpeed => _groundSpeed;
     public float AirHorizontalSpeed => _airHorizontalSpeed;
@@ -105,6 +110,7 @@ public class Character : Entity, IDamagable
 
     private void Update()
     {
+<<<<<<< HEAD
         TryInteract();
     }
 
@@ -120,6 +126,37 @@ public class Character : Entity, IDamagable
     {
         Debug.Log(interactable);
             _currentInteractable = interactable;
+=======
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            _currentInteractable?.Interact();
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.TryGetComponent<IInteractable>(out var interactable))
+        {
+            _currentInteractable = interactable;
+        }
+
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.TryGetComponent<IInteractable>(out var interactable))
+        {
+            _currentInteractable = null;
+        }
+    }
+
+    public void TryInterract(IInteractable interactable)
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            interactable.Interact();
+        }
+>>>>>>> b9303f46096a31d8213b5436b541e36359e917f9
     }
 
     private void OnDestroy()
