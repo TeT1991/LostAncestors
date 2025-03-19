@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7291054833570412983}
   - component: {fileID: 5741701072967087653}
   - component: {fileID: 6663885701924662529}
+  - component: {fileID: 5295021147889297751}
   m_Layer: 2
   m_Name: CharacterMeleeProjectile
   m_TagString: Untagged
@@ -127,8 +128,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70bc2569a91f3f842995d228427d0bd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _ownerType: 0
   _speed: 0
-  _lifeTime: 0.5
+  _damage: 1
 --- !u!114 &5741701072967087653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,3 +188,38 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!58 &5295021147889297751
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 370366244188468717}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.5
