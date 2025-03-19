@@ -18,8 +18,6 @@ public class JumpingState : EntityState
     {
         base.FrameUpdate();
 
-        _character.Jumper.UpdatePosition();
-
         _character.DirectionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
 
         if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))

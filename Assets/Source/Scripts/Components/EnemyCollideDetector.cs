@@ -41,8 +41,6 @@ public class EnemyCollideDetector : MonoBehaviour
         _isWallCollided = false;
         _collider = GetComponent<Collider2D>();
         SetDirection(direction);
-
-
     }
 
     public void SetDirection(float direction)
@@ -52,9 +50,9 @@ public class EnemyCollideDetector : MonoBehaviour
 
     private void TryDetectCharacter()
     {
-        RaycastHit2D hit = Physics2D.Raycast(_rayStartPoint.position, _direction.normalized, _viewDistance);
+        RaycastHit2D hit = Physics2D.Raycast(_rayStartPoint.position, _direction.normalized, _viewDistance, LayerMask.GetMask("Through"));
 
-        if (hit != false && hit.collider.TryGetComponent(out Player character))
+        if (hit != false && hit.collider.TryGetComponent(out Character character))
         {
             _isCharacterDetected = true;
         }
@@ -72,13 +70,10 @@ public class EnemyCollideDetector : MonoBehaviour
         {
             foreach (var hit in hits)
             {
-                if (hit.TryGetComponent<Projectile>(out Projectile projectile))
+                if (hit.TryGetComponent(out PlayerProjectile projectile))
                 {
-                    if (projectile.OwnerType != OwnerType.Enemy)
-                    {
                         ProjectileCollided?.Invoke(projectile.Damage);
                         projectile.Destroy();
-                    }
                 }
             }
         }

@@ -4,6 +4,10 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class CharacterCollideDetector : MonoBehaviour
 {
+    [SerializeField] private PlatformDetector _platformDetector;
+    [SerializeField] private WallDetector _wallDetector;
+    [SerializeField] private InteractableDetector _interactableDetector;
+
     private string _projectileLayerName;
     private string _platformLayerName;
     private string _pickablesLayerName;
@@ -23,10 +27,12 @@ public class CharacterCollideDetector : MonoBehaviour
     public Action<int> ProjectileCollided;
     public Action<Pickable> PickaleCollided;
 
+    public event Action<IInteractable> InteractableCollided;
+
     private void Update()
     {
-        TryDetectGroundCollision();
-        TryDetectWallCollision();
+        //TryDetectGroundCollision();
+        //TryDetectWallCollision();
         TryDetectProjectileCollision();
         TryDetectPickableCollision();
     }
@@ -39,58 +45,38 @@ public class CharacterCollideDetector : MonoBehaviour
         _platformLayerName = "Platform";
         _pickablesLayerName = "Pickables";
 
+
+        _platformDetector.Init(_collider);
+        _wallDetector.Init();
+        _interactableDetector.Init();
+
         SetDirection(direction);
+
+        _platformDetector.Collided += HasPlatformCollided;
+        _wallDetector.Collided += HasDetectWallCollision;
+        _interactableDetector.Collided += HasInteractableCollided;
     }
 
     public void SetDirection(float direction)
     {
         _direction = (Vector2.right * direction).normalized;
+        _wallDetector.FlipColliderDirection(_direction.x);
     }
 
-    private void TryDetectGroundCollision()
+    private void HasPlatformCollided(bool value)
     {
-        float detectionOffset = 0.1f;
-        Collider2D[] hits = Physics2D.OverlapPointAll(_collider.bounds.min - new Vector3(0, detectionOffset), LayerMask.GetMask(_platformLayerName)); ;
-        bool isPlatformCollided = false;
-
-        if (hits.Length > 0)
-        {
-            foreach (var hit in hits)
-            {
-                if (hit.TryGetComponent<Platform>(out Platform platform))
-                {
-                    isPlatformCollided = true;
-                }
-                else
-                {
-                    isPlatformCollided = false;
-                }
-            }
-        }
-
-        if (_isPlatformCollided != isPlatformCollided)
-        {
-            _isPlatformCollided = isPlatformCollided;
-            PlatformCollided?.Invoke(_isPlatformCollided);
-        }
+        _isPlatformCollided = value;
+        PlatformCollided?.Invoke(value);
     }
 
-    private void TryDetectWallCollision()
+    private void HasDetectWallCollision(bool value)
     {
-        float detectionOffset = _collider.bounds.extents.x + 0.1f;
+        _isWallCollided = value;
+    }
 
-        RaycastHit2D hit = Physics2D.Raycast(_collider.bounds.center, _direction.normalized, detectionOffset, LayerMask.GetMask(_platformLayerName));
-
-        Debug.DrawRay(_collider.bounds.center, _direction.normalized * detectionOffset, Color.red, Time.deltaTime);
-
-        if (hit)
-        {
-            _isWallCollided = true;
-        }
-        else
-        {
-            _isWallCollided = false;
-        }
+    private void HasInteractableCollided(IInteractable interactable)
+    {
+        InteractableCollided?.Invoke(interactable);
     }
 
     private void TryDetectProjectileCollision()
@@ -101,13 +87,11 @@ public class CharacterCollideDetector : MonoBehaviour
         {
             foreach (var hit in hits)
             {
-                if (hit.TryGetComponent<Projectile>(out Projectile projectile))
+                if (hit.TryGetComponent(out EnemyProjectile projectile))
                 {
-                    if (projectile.OwnerType != OwnerType.Character)
-                    {
-                        ProjectileCollided?.Invoke(projectile.Damage);
-                        projectile.Destroy();
-                    }
+                    ProjectileCollided?.Invoke(projectile.Damage);
+                    projectile.Destroy();
+
                 }
             }
         }

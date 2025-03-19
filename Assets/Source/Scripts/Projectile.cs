@@ -5,7 +5,6 @@ using UnityEngine;
 [RequireComponent(typeof(CircleCollider2D))]
 public class Projectile : MonoBehaviour
 {
-    [SerializeField] private OwnerType _ownerType;
     [SerializeField] private float _speed;
     [SerializeField] private float _lifeTime;
     private int _damage;
@@ -18,7 +17,6 @@ public class Projectile : MonoBehaviour
 
     private string _platformLayerMask;
 
-    public OwnerType OwnerType => _ownerType;
     public int Damage => _damage;
 
     private void Start()
@@ -34,11 +32,6 @@ public class Projectile : MonoBehaviour
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
-        if(_ownerType== OwnerType.Character && collision.gameObject.TryGetComponent<IInteractable>(out IInteractable interactable))
-        {
-            interactable.Interact();
-            Destroy();
-        }
     }
 
     public void Init()

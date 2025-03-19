@@ -35,8 +35,6 @@ public class CharacterStatesHandle : MonoBehaviour
 
         _character = character;
 
-        _character.CollideDetector.PlatformCollided += SetJumpingStatus;
-
         InitStateMachine();
         InitConditions();
     }

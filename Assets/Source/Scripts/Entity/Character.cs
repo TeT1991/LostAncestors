@@ -1,7 +1,11 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Mover), typeof(Jumper), typeof(Attacker))]
-[RequireComponent(typeof(CharacterCollideDetector), typeof(CharacterStatesHandle))]
+[RequireComponent(typeof(Mover))]
+[RequireComponent(typeof(Jumper))]
+[RequireComponent(typeof(Attacker))]
+[RequireComponent(typeof(CharacterStatesHandle))]
+[RequireComponent(typeof(CharacterCollideDetector))]
+[RequireComponent(typeof(Rigidbody2D))]
 public class Character : Entity, IDamagable
 {
     [SerializeField] private Transform _projectileRangeLaunchPoint;
@@ -21,8 +25,9 @@ public class Character : Entity, IDamagable
     private DirectionSwitcher _directionSwitcher;
     private CharacterStatesHandle _characterStatesSwitchCheck;
 
-    private IInteractable _currentInteractable;
+    private Rigidbody2D _rigidBody;
 
+    private IInteractable _currentInteractable;
 
     public float GroundSpeed => _groundSpeed;
     public float AirHorizontalSpeed => _airHorizontalSpeed;
@@ -58,10 +63,11 @@ public class Character : Entity, IDamagable
         _attacker = GetComponent<Attacker>();
         _collideDetector = GetComponent<CharacterCollideDetector>();
         _characterStatesSwitchCheck = GetComponent<CharacterStatesHandle>();
+        _rigidBody = GetComponent<Rigidbody2D>();
 
         _directionSwitcher = new DirectionSwitcher();
 
-        _jumper.Init(_jumpHeight);
+        _jumper.Init(_jumpHeight, _rigidBody);
         _attacker.Init(_reloadTime);
         _directionSwitcher.Init(Config.StartDirection);
         _collideDetector.Init(_directionSwitcher, _directionSwitcher.Direction);
@@ -70,6 +76,7 @@ public class Character : Entity, IDamagable
         _collideDetector.PlatformCollided += _characterStatesSwitchCheck.SetJumpingStatus;
         _collideDetector.ProjectileCollided += ApplyDamage;
         _collideDetector.PickaleCollided += TryPickUp;
+        _collideDetector.InteractableCollided += SetCurrentInteractable;
 
         _directionSwitcher.DirectionChanged += FlipSprites;
         _directionSwitcher.DirectionChanged += _collideDetector.SetDirection;
@@ -98,35 +105,21 @@ public class Character : Entity, IDamagable
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        TryInteract();
+    }
+
+    private void TryInteract()
+    {
+        if(_currentInteractable != null && Input.GetKey(KeyCode.E))
         {
-            _currentInteractable?.Interact();
+            _currentInteractable.Interact();
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void SetCurrentInteractable(IInteractable interactable)
     {
-        if (collision.gameObject.TryGetComponent<IInteractable>(out var interactable))
-        {
+        Debug.Log(interactable);
             _currentInteractable = interactable;
-        }
-
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.gameObject.TryGetComponent<IInteractable>(out var interactable))
-        {
-            _currentInteractable = null;
-        }
-    }
-
-    public void TryInterract(IInteractable interactable)
-    {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            interactable.Interact();
-        }
     }
 
     private void OnDestroy()

@@ -18,5 +18,5 @@ MonoBehaviour:
   _jumpPower: 10
   _reloadTime: 1
   _startDirection: 1
-  _projectileRange: {fileID: 7291054833570412983, guid: 1633d898193907a4d8d643f6ce8adcd5, type: 3}
+  _projectileRange: {fileID: -6359765487570704369, guid: 1633d898193907a4d8d643f6ce8adcd5, type: 3}
   _projectileMelee: {fileID: 0}
