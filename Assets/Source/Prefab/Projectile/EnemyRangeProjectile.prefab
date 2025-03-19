@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 8618930782057556170}
   - component: {fileID: 284288868420463606}
   - component: {fileID: 2665024258670416668}
-  - component: {fileID: 7291054833570412983}
   - component: {fileID: 5741701072967087653}
+  - component: {fileID: -6359765487570704369}
   m_Layer: 8
   m_Name: EnemyRangeProjectile
   m_TagString: Untagged
@@ -122,21 +122,6 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
---- !u!114 &7291054833570412983
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 370366244188468717}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70bc2569a91f3f842995d228427d0bd3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _ownerType: 1
-  _speed: 10
-  _lifeTime: 3
 --- !u!114 &5741701072967087653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,3 +134,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07525d04ad86cbf43bee6723e411101e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-6359765487570704369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 370366244188468717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b1ae27b213978a479cba81973d75bb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ownerType: 0
+  _speed: 3
+  _lifeTime: 3

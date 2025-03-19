@@ -21,6 +21,8 @@ public class Character : Entity, IDamagable
     private DirectionSwitcher _directionSwitcher;
     private CharacterStatesHandle _characterStatesSwitchCheck;
 
+    private IInteractable _currentInteractable;
+
 
     public float GroundSpeed => _groundSpeed;
     public float AirHorizontalSpeed => _airHorizontalSpeed;
@@ -91,6 +93,39 @@ public class Character : Entity, IDamagable
                 HealthHandler.ApplyHeal(healCount);
                 pickable.PickUp();
             }
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            _currentInteractable?.Interact();
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.TryGetComponent<IInteractable>(out var interactable))
+        {
+            _currentInteractable = interactable;
+        }
+
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.TryGetComponent<IInteractable>(out var interactable))
+        {
+            _currentInteractable = null;
+        }
+    }
+
+    public void TryInterract(IInteractable interactable)
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            interactable.Interact();
         }
     }
 

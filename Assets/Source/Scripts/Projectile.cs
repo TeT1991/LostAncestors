@@ -1,14 +1,16 @@
 using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(Mover), typeof(CircleCollider2D))]
+[RequireComponent(typeof(Mover))]
+[RequireComponent(typeof(CircleCollider2D))]
 public class Projectile : MonoBehaviour
 {
     [SerializeField] private OwnerType _ownerType;
     [SerializeField] private float _speed;
-    [SerializeField] private int _damage;
+    [SerializeField] private float _lifeTime;
+    private int _damage;
 
-    private WaitForSeconds _lifeTime;
+    private WaitForSeconds _wait;
 
     private CircleCollider2D _collider;
     private Mover _mover;
@@ -24,23 +26,31 @@ public class Projectile : MonoBehaviour
         Init();
     }
 
+    private void Update()
+    {
+        TryDestroyByCollide();
+        _mover.Move(_speed);
+    }
+
+    protected virtual void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(_ownerType== OwnerType.Character && collision.gameObject.TryGetComponent<IInteractable>(out IInteractable interactable))
+        {
+            interactable.Interact();
+            Destroy();
+        }
+    }
+
     public void Init()
     {
-        _speed = 10;
         _damage = 1;
-        _lifeTime = new WaitForSeconds(3);
+        _wait = new WaitForSeconds(_lifeTime);
 
         _collider = GetComponent<CircleCollider2D>();
         _mover = GetComponent<Mover>();
         _coroutine = StartCoroutine(DestroyByTime());
 
         _platformLayerMask = "Platform";
-    }
-
-    private void Update()
-    {
-        TryDestroyByCollide();
-        _mover.Move(_speed);
     }
 
     public void Destroy()
@@ -50,7 +60,7 @@ public class Projectile : MonoBehaviour
 
     private IEnumerator DestroyByTime()
     {
-        yield return _lifeTime;
+        yield return _wait;
         Destroy(gameObject);
     }
 
