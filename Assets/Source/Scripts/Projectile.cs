@@ -30,18 +30,8 @@ public class Projectile : MonoBehaviour
         _mover.Move(_speed);
     }
 
-<<<<<<< HEAD
     protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
-=======
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if(_ownerType== OwnerType.Character && collision.gameObject.TryGetComponent<IInteractable>(out IInteractable interactable))
-        {
-            interactable.Interact();
-            Destroy();
-        }
->>>>>>> b9303f46096a31d8213b5436b541e36359e917f9
     }
 
     public void Init()
