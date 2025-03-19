@@ -1,3 +1,5 @@
 using UnityEngine;
 
-public class Obstacle : MonoBehaviour { }
+public class Obstacle : MonoBehaviour
+{
+}

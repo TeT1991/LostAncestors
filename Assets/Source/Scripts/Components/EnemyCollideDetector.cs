@@ -1,13 +1,11 @@
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 [RequireComponent(typeof(Collider2D))]
 public class EnemyCollideDetector : MonoBehaviour
 {
     private Collider2D _collider;
     private Transform _rayStartPoint;
-
     private Vector2 _direction;
     private float _viewDistance;
     private bool _isCharacterDetected;
@@ -20,8 +18,6 @@ public class EnemyCollideDetector : MonoBehaviour
 
     public Action WallCollided;
     public Action<int> ProjectileCollided;
-
-    private Button _button;
 
     private void Update()
     {
@@ -41,8 +37,6 @@ public class EnemyCollideDetector : MonoBehaviour
         _isWallCollided = false;
         _collider = GetComponent<Collider2D>();
         SetDirection(direction);
-
-
     }
 
     public void SetDirection(float direction)
@@ -52,9 +46,9 @@ public class EnemyCollideDetector : MonoBehaviour
 
     private void TryDetectCharacter()
     {
-        RaycastHit2D hit = Physics2D.Raycast(_rayStartPoint.position, _direction.normalized, _viewDistance);
+        RaycastHit2D hit = Physics2D.Raycast(_rayStartPoint.position, _direction.normalized, _viewDistance, LayerMask.GetMask(_characterLayerName, _platformLayerName));
 
-        if (hit != false && hit.collider.TryGetComponent(out Player character))
+        if (hit != false && hit.collider.TryGetComponent<Character>(out Character character))
         {
             _isCharacterDetected = true;
         }
