@@ -3,6 +3,7 @@ using UnityEngine;
 public class JumpingState : EntityState
 {
     private readonly Character _character;
+    private readonly Mover _mover;
 
     public JumpingState(Entity entity, StateMachine stateMachine) : base(entity, stateMachine)
     {
@@ -26,7 +27,7 @@ public class JumpingState : EntityState
 
             if (_character.CollideDetector.IsWallCollided == false)
             {
-                _character.Mover.Move(_character.AirHorizontalSpeed * _character.DirectionSwitcher.Direction);
+                _character.Mover.MoveHorizontal(_character.AirHorizontalSpeed * _character.DirectionSwitcher.Direction);
             }
         }
 

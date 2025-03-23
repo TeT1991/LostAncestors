@@ -7,7 +7,7 @@ public class PlatformDetector : Detector
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.TryGetComponent(out Platform platform))
+        if (collision.gameObject.TryGetComponent(out GroundObstacle platform))
         {
             Collided?.Invoke(true);
         }
@@ -15,7 +15,7 @@ public class PlatformDetector : Detector
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.TryGetComponent(out Platform platform))
+        if (collision.gameObject.TryGetComponent(out GroundObstacle platform))
         {
             Collided?.Invoke(false);
         }

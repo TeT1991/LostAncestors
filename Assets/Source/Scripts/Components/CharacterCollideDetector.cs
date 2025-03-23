@@ -7,8 +7,9 @@ public class CharacterCollideDetector : MonoBehaviour
     [SerializeField] private PlatformDetector _platformDetector;
     [SerializeField] private WallDetector _wallDetector;
     [SerializeField] private InteractableDetector _interactableDetector;
+    [SerializeField] private ProjectileDetector _projectileDetector;
+    [SerializeField] private LadderDetector _ladderDetector;
 
-    private string _projectileLayerName;
     private string _platformLayerName;
     private string _pickablesLayerName;
 
@@ -19,6 +20,7 @@ public class CharacterCollideDetector : MonoBehaviour
 
     private bool _isPlatformCollided;
     private bool _isWallCollided;
+    private bool _isLadderCollided;
 
     public bool IsWallCollided => _isWallCollided;
 
@@ -26,6 +28,7 @@ public class CharacterCollideDetector : MonoBehaviour
     public Action ObstacleCollided;
     public Action<int> ProjectileCollided;
     public Action<Pickable> PickaleCollided;
+    public Action<bool> LadderColided;
 
     public event Action<IInteractable> InteractableCollided;
 
@@ -33,7 +36,7 @@ public class CharacterCollideDetector : MonoBehaviour
     {
         //TryDetectGroundCollision();
         //TryDetectWallCollision();
-        TryDetectProjectileCollision();
+        //TryDetectProjectileCollision();
         TryDetectPickableCollision();
     }
 
@@ -41,20 +44,20 @@ public class CharacterCollideDetector : MonoBehaviour
     {
         _collider = GetComponent<Collider2D>();
         _directionSwitcher = directionSwitcher;
-        _projectileLayerName = "Projectiles";
-        _platformLayerName = "Platform";
-        _pickablesLayerName = "Pickables";
 
-
-        _platformDetector.Init(_collider);
+        _platformDetector.Init();
         _wallDetector.Init();
         _interactableDetector.Init();
+        _projectileDetector.Init(_collider);
+        _ladderDetector.Init();
 
         SetDirection(direction);
 
-        _platformDetector.Collided += HasPlatformCollided;
+        _platformDetector.Collided += HasDetectPlatformCollision;
         _wallDetector.Collided += HasDetectWallCollision;
-        _interactableDetector.Collided += HasInteractableCollided;
+        _interactableDetector.Colided += HasDetectInteractableCollision;
+        _projectileDetector.Collided += HasDetectProjectileCollision;
+        _ladderDetector.Collided += HadDetectLadderCollision;
     }
 
     public void SetDirection(float direction)
@@ -63,7 +66,7 @@ public class CharacterCollideDetector : MonoBehaviour
         _wallDetector.FlipColliderDirection(_direction.x);
     }
 
-    private void HasPlatformCollided(bool value)
+    private void HasDetectPlatformCollision(bool value)
     {
         _isPlatformCollided = value;
         PlatformCollided?.Invoke(value);
@@ -74,27 +77,23 @@ public class CharacterCollideDetector : MonoBehaviour
         _isWallCollided = value;
     }
 
-    private void HasInteractableCollided(IInteractable interactable)
+    private void HasDetectInteractableCollision(IInteractable interactable)
     {
         InteractableCollided?.Invoke(interactable);
     }
 
-    private void TryDetectProjectileCollision()
+    private void HasDetectProjectileCollision(Projectile projectile)
     {
-        Collider2D[] hits = Physics2D.OverlapBoxAll(_collider.bounds.center, _collider.bounds.size, 0, LayerMask.GetMask(_projectileLayerName));
-
-        if (hits.Length > 0)
+        if(projectile is EnemyProjectile)
         {
-            foreach (var hit in hits)
-            {
-                if (hit.TryGetComponent(out EnemyProjectile projectile))
-                {
-                    ProjectileCollided?.Invoke(projectile.Damage);
-                    projectile.Destroy();
-
-                }
-            }
+            ProjectileCollided?.Invoke(projectile.Damage);
         }
+    }
+
+    private void HadDetectLadderCollision(bool value)
+    {
+        _isLadderCollided = value;
+        LadderColided?.Invoke(value);   
     }
 
     private void TryDetectPickableCollision()

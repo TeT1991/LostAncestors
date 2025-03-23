@@ -3,6 +3,8 @@ using UnityEngine;
 
 [RequireComponent(typeof(Mover))]
 [RequireComponent(typeof(CircleCollider2D))]
+[RequireComponent(typeof(WallDetector))]
+
 public class Projectile : MonoBehaviour
 {
     [SerializeField] private float _speed;
@@ -15,8 +17,6 @@ public class Projectile : MonoBehaviour
     private Mover _mover;
     private Coroutine _coroutine;
 
-    private string _platformLayerMask;
-
     public int Damage => _damage;
 
     private void Start()
@@ -26,12 +26,15 @@ public class Projectile : MonoBehaviour
 
     private void Update()
     {
-        TryDestroyByCollide();
-        _mover.Move(_speed);
+        _mover.MoveHorizontal(_speed);
     }
 
-    protected virtual void OnCollisionEnter2D(Collision2D collision)
+    protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
+        if (collision.gameObject.TryGetComponent(out Obstacle obstacle))
+        {
+            Destroy(gameObject);
+        }
     }
 
     public void Init()
@@ -42,8 +45,6 @@ public class Projectile : MonoBehaviour
         _collider = GetComponent<CircleCollider2D>();
         _mover = GetComponent<Mover>();
         _coroutine = StartCoroutine(DestroyByTime());
-
-        _platformLayerMask = "Platform";
     }
 
     public void Destroy()
@@ -55,15 +56,5 @@ public class Projectile : MonoBehaviour
     {
         yield return _wait;
         Destroy(gameObject);
-    }
-
-    private void TryDestroyByCollide()
-    {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(_collider.bounds.center, _collider.radius, LayerMask.GetMask(_platformLayerMask));
-
-        if (hits.Length > 0)
-        {
-            Destroy(gameObject);
-        }
     }
 }

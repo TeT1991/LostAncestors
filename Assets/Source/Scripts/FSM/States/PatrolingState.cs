@@ -15,6 +15,6 @@ public class PatrolingState : EntityState
 
     public override void FrameUpdate()
     {
-        _enemy.Mover.Move(_enemy.GroundSpeed * _enemy.DirectionSwitcher.Direction);
+        _enemy.Mover.MoveHorizontal(_enemy.GroundSpeed * _enemy.DirectionSwitcher.Direction);
     }
 }

@@ -3,13 +3,14 @@ using UnityEngine;
 
 public class InteractableDetector : Detector
 {
-    public event Action<IInteractable> Collided;
+    public event Action<IInteractable> Colided;
+    public event Action TriggerExit;
 
     protected override void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.gameObject.TryGetComponent(out IInteractable interactable))
         {
-            Collided?.Invoke(interactable);
+            Colided?.Invoke(interactable);
             interactable.ShowMessage();
         }
     }
@@ -18,7 +19,7 @@ public class InteractableDetector : Detector
     {
         if (collision.gameObject.TryGetComponent(out IInteractable interactable))
         {
-            Collided?.Invoke(interactable);
+            Colided?.Invoke(null);
             interactable.HideMessage();
         }
     }

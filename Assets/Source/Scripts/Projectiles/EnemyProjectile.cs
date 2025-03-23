@@ -2,11 +2,12 @@
 
 public class EnemyProjectile : Projectile
 {
-    protected override void OnCollisionEnter2D(Collision2D collision)
+    protected override void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.TryGetComponent(out Character character))
         {
-            Debug.Log("DAMAGE");
+            int damage = 1;
+            character.ApplyDamage(damage);
         }
     }
 }

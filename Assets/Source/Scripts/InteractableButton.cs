@@ -18,7 +18,6 @@ public class InteractableButton : MonoBehaviour, IInteractable
             _controlableObject = null;
             Destroy(this);
             Destroy(GetComponent<Collider2D>());
-
         }
     }
 

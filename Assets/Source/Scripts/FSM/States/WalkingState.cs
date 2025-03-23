@@ -33,7 +33,7 @@ public class WalkingState : EntityState
         {
             animationName = "Walk";
             _character.AnimationSwitcher.TrySetAnimation(animationName, true);
-            _mover.Move(_character.GroundSpeed * _directionSwitcher.Direction);
+            _mover.MoveHorizontal(_character.GroundSpeed * _directionSwitcher.Direction);
         }
     }
 }

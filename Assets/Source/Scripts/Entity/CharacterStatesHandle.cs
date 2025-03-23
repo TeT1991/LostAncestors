@@ -1,30 +1,37 @@
+using TMPro;
 using UnityEngine;
 
 public class CharacterStatesHandle : MonoBehaviour
 {
+    public TextMeshProUGUI _text;
+
     [SerializeField] private CharacterSwitcher _characterSwitcher;
     private Character _character;
 
     private bool _isWalking = false;
     private bool _isJumping = false;
     private bool _isAttacking = false;
+    private bool _isClimbing = false;
 
     private StateMachine _stateMachine;
     private IdleState _idleState;
     private WalkingState _walkingState;
     private JumpingState _jumpingState;
     private AttackCharacterState _attackState;
+    private ClimbingState _climbingState;
 
     private Conditions _idleConditions;
     private Conditions _walkConditions;
     private Conditions _jumpConditions;
     private Conditions _attackConditions;
+    private Conditions _climbingConditons;
 
     private void Update()
     {
         TrySetState();
         ApplyStateActions();
         UpdateConditions();
+        _text.text = _stateMachine.CurrentState.ToString();
     }
 
     public void Init(Character character)
@@ -32,6 +39,7 @@ public class CharacterStatesHandle : MonoBehaviour
         _isWalking = false;
         _isJumping = false;
         _isAttacking = false;
+        _isClimbing = false;
 
         _character = character;
 
@@ -47,6 +55,11 @@ public class CharacterStatesHandle : MonoBehaviour
     public void SetAttackStatus(bool value)
     {
         _isAttacking = value;
+    }
+
+    public void SetClimbingStatus(bool value)
+    {
+        _isClimbing = value;
     }
 
     private void TrySetAttackingState()
@@ -113,6 +126,26 @@ public class CharacterStatesHandle : MonoBehaviour
         }
     }
 
+    private void TrySetClimbingState()
+    {
+        if (_climbingConditons.IsConditionsCompleted())
+        {
+            if (_isClimbing)
+            {
+                if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S))
+                {
+                    Debug.Log("!!!!");
+                    TryChangeState(_climbingState);
+                }
+                else
+                {
+                    _isClimbing = false;
+                }
+            }
+
+        }
+    }
+
     private void TryChangeState(EntityState state)
     {
         if (_stateMachine.CurrentState != state)
@@ -132,14 +165,16 @@ public class CharacterStatesHandle : MonoBehaviour
         TrySetWalkintState();
         TrySetJumpingState();
         TrySetAttackingState();
+        TrySetClimbingState();
     }
 
     private void UpdateConditions()
     {
-        _idleConditions.UpdateConditionsStatus(_isWalking, _isJumping, _isAttacking);
-        _walkConditions.UpdateConditionsStatus(_isJumping, _isAttacking);
-        _jumpConditions.UpdateConditionsStatus(_isJumping, _isAttacking);
-        _attackConditions.UpdateConditionsStatus(_isAttacking, _isJumping);
+        _idleConditions.UpdateConditionsStatus(_isWalking, _isJumping, _isAttacking, _isClimbing);
+        _walkConditions.UpdateConditionsStatus(_isJumping, _isAttacking, _isClimbing);
+        _jumpConditions.UpdateConditionsStatus(_isJumping, _isAttacking, _isClimbing);
+        _attackConditions.UpdateConditionsStatus(_isAttacking, _isJumping, _isClimbing);
+        _climbingConditons.UpdateConditionsStatus(_isAttacking, !_isClimbing);
     }
 
     private void InitConditions()
@@ -148,6 +183,7 @@ public class CharacterStatesHandle : MonoBehaviour
         _walkConditions = new Conditions();
         _jumpConditions = new Conditions();
         _attackConditions = new Conditions();
+        _climbingConditons = new Conditions();
 
         UpdateConditions();
     }
@@ -159,6 +195,7 @@ public class CharacterStatesHandle : MonoBehaviour
         _walkingState = new WalkingState(_character, _stateMachine);
         _jumpingState = new JumpingState(_character, _stateMachine);
         _attackState = new AttackCharacterState(_character, _stateMachine);
+        _climbingState = new ClimbingState(_character, _stateMachine);
 
         _stateMachine.Init(_idleState);
     }

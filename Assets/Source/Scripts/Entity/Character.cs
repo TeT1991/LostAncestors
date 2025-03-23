@@ -41,6 +41,7 @@ public class Character : Entity, IDamagable
     public Attacker Attacker => _attacker;
     public CharacterCollideDetector CollideDetector => _collideDetector;
     public DirectionSwitcher DirectionSwitcher => _directionSwitcher;
+    public Rigidbody2D RigidBody => _rigidBody;
 
     protected override void LoadConfig()
     {
@@ -74,6 +75,7 @@ public class Character : Entity, IDamagable
         _characterStatesSwitchCheck.Init(this);
 
         _collideDetector.PlatformCollided += _characterStatesSwitchCheck.SetJumpingStatus;
+        _collideDetector.LadderColided += _characterStatesSwitchCheck.SetClimbingStatus;
         _collideDetector.ProjectileCollided += ApplyDamage;
         _collideDetector.PickaleCollided += TryPickUp;
         _collideDetector.InteractableCollided += SetCurrentInteractable;
@@ -110,16 +112,49 @@ public class Character : Entity, IDamagable
 
     private void TryInteract()
     {
-        if(_currentInteractable != null && Input.GetKey(KeyCode.E))
+        if (_currentInteractable is InteractableButton interactable)
         {
-            _currentInteractable.Interact();
+            if (Input.GetKey(KeyCode.E))
+            {
+                _currentInteractable.Interact();
+            }
+        }
+
+        switch (_currentInteractable)
+        {
+            case InteractableButton interactableButton:
+
+                if (Input.GetKey(KeyCode.E))
+                {
+                    _currentInteractable.Interact();
+                }
+                break;
+
+            case MovingPlatform movingPlatform:
+
+                if (Input.GetKeyDown(KeyCode.W))
+                {
+                    movingPlatform.SetNextStop(1);
+                    _currentInteractable.Interact();
+                }
+
+                if (Input.GetKeyDown(KeyCode.S))
+                {
+                    movingPlatform.SetNextStop(-1);
+                    _currentInteractable.Interact();
+                }
+                break;
         }
     }
 
     private void SetCurrentInteractable(IInteractable interactable)
     {
-        Debug.Log(interactable);
-            _currentInteractable = interactable;
+        _currentInteractable = interactable;
+    }
+
+    private void ResetCurrentInterractable()
+    {
+        _currentInteractable = null;
     }
 
     private void OnDestroy()
