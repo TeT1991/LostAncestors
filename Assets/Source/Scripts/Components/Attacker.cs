@@ -36,6 +36,7 @@ public class Attacker : MonoBehaviour
     {
         _projectile = projectile;
         _launchPoint = launchPoint;
+        Debug.Log(_projectile.name);
     }
 
     private IEnumerator Reload(float reloadTime)

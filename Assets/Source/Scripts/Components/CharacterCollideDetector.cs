@@ -18,25 +18,24 @@ public class CharacterCollideDetector : MonoBehaviour
     private Collider2D _collider;
     private DirectionSwitcher _directionSwitcher;
 
-    private bool _isPlatformCollided;
+    private bool _isGroundCollided;
     private bool _isWallCollided;
     private bool _isLadderCollided;
 
+    public bool IsGroundCollided => _isGroundCollided;
     public bool IsWallCollided => _isWallCollided;
+    public bool IsLadderColided => _isLadderCollided;
 
     public Action<bool> PlatformCollided;
     public Action ObstacleCollided;
     public Action<int> ProjectileCollided;
-    public Action<Pickable> PickaleCollided;
+    public Action<Item> PickaleCollided;
     public Action<bool> LadderColided;
 
     public event Action<IInteractable> InteractableCollided;
 
     private void Update()
     {
-        //TryDetectGroundCollision();
-        //TryDetectWallCollision();
-        //TryDetectProjectileCollision();
         TryDetectPickableCollision();
     }
 
@@ -68,7 +67,7 @@ public class CharacterCollideDetector : MonoBehaviour
 
     private void HasDetectPlatformCollision(bool value)
     {
-        _isPlatformCollided = value;
+        _isGroundCollided = value;
         PlatformCollided?.Invoke(value);
     }
 
@@ -104,7 +103,7 @@ public class CharacterCollideDetector : MonoBehaviour
         {
             foreach (var hit in hits)
             {
-                if (hit.TryGetComponent<Pickable>(out Pickable pickable))
+                if (hit.TryGetComponent<Item>(out Item pickable))
 
                 {
                     PickaleCollided.Invoke(pickable);

@@ -6,197 +6,203 @@ public class CharacterStatesHandle : MonoBehaviour
     public TextMeshProUGUI _text;
 
     [SerializeField] private CharacterSwitcher _characterSwitcher;
+    [SerializeField] private CharacterCollideDetector _characterCollideDetector;
+
     private Character _character;
 
     private bool _isWalking = false;
     private bool _isJumping = false;
     private bool _isAttacking = false;
     private bool _isClimbing = false;
-
-    private StateMachine _stateMachine;
-    private IdleState _idleState;
-    private WalkingState _walkingState;
-    private JumpingState _jumpingState;
-    private AttackCharacterState _attackState;
-    private ClimbingState _climbingState;
-
-    private Conditions _idleConditions;
-    private Conditions _walkConditions;
-    private Conditions _jumpConditions;
-    private Conditions _attackConditions;
-    private Conditions _climbingConditons;
+    private bool _isIdle = true;
 
     private void Update()
     {
-        TrySetState();
-        ApplyStateActions();
-        UpdateConditions();
-        _text.text = _stateMachine.CurrentState.ToString();
+        SetStatus();
+
+        PerformWalkingAction();
+        PerformJumpAction();
+        PerformAttackAction();
+        PerformClimbingAction();
+        PerformIdleAction();
     }
 
     public void Init(Character character)
+    {
+        ResetBools();
+
+        _character = character;
+    }
+
+    private void ResetBools()
     {
         _isWalking = false;
         _isJumping = false;
         _isAttacking = false;
         _isClimbing = false;
-
-        _character = character;
-
-        InitStateMachine();
-        InitConditions();
     }
 
-    public void SetJumpingStatus(bool value)
+    private void SetStatus()
     {
-        _isJumping = !value;
-    }
-
-    public void SetAttackStatus(bool value)
-    {
-        _isAttacking = value;
-    }
-
-    public void SetClimbingStatus(bool value)
-    {
-        _isClimbing = value;
-    }
-
-    private void TrySetAttackingState()
-    {
-        if (_attackConditions.IsConditionsCompleted())
+        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
         {
-            string animationName = "RangeAttack";
+            if (_isWalking == false && _isAttacking == false && _isJumping == false && _isClimbing == false)
+            {
+                if (_characterCollideDetector.IsGroundCollided)
+                {
+                    ResetBools();
+                    _isWalking = true;
+
+                    return;
+                }
+            }
+        }
+        else
+        {
+            _isWalking = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (_isAttacking == false && _isJumping == false && _isClimbing == false)
+            {
+                ResetBools();
+
+                _character.Jumper.SetDeafaultModifier();
+                _isJumping = true;
+
+                return;
+            }
+        }
+        else
+        {
+            if (_characterCollideDetector.IsGroundCollided)
+            {
+                _isJumping = false;
+            }
+        }
+
+        if (_isAttacking == false && _isJumping == false && _isClimbing == false)
+        {
+            Projectile projectile;
+            Transform launchPoint;
 
             if (Input.GetMouseButtonDown(0))
             {
+                projectile = _character.MeleeProjectile;
+                launchPoint = _character.ProjectileMeleeLaunchPoint;
+                _character.Attacker.SetProjectile(projectile, launchPoint);
+                ResetBools();
                 _isAttacking = true;
-                _attackState.SetAttackInfo(_character.MeleeProjectile, _character.ProjectileMeleeLaunchPoint, animationName);
-
-                TryChangeState(_attackState);
+                return;
             }
 
-            if (Input.GetMouseButtonDown(1))
+            else if (Input.GetMouseButtonDown(1))
             {
+                projectile = _character.RangeProjectile;
+                launchPoint = _character.ProjectileRangeLaunchPoint;
+                _character.Attacker.SetProjectile(projectile, launchPoint);
+                ResetBools();
                 _isAttacking = true;
-                _attackState.SetAttackInfo(_character.RangeProjectile, _character.ProjectileRangeLaunchPoint, animationName);
-
-                TryChangeState(_attackState);
-            }
-        }
-    }
-
-    private void TrySetJumpingState()
-    {
-        if (_jumpConditions.IsConditionsCompleted())
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                _isJumping = true;
-
-                TryChangeState(_jumpingState);
-            }
-        }
-    }
-
-    private void TrySetWalkintState()
-    {
-        if (_walkConditions.IsConditionsCompleted())
-        {
-            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
-            {
-                _isWalking = true;
-
-                _character.DirectionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
-
-                TryChangeState(_walkingState);
+                return;
             }
             else
             {
-                _isWalking = false;
+                _isAttacking = false;
             }
         }
-    }
 
-    private void TrySetIdleState()
-    {
-        if (_idleConditions.IsConditionsCompleted())
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S))
         {
-            TryChangeState(_idleState);
-        }
-    }
-
-    private void TrySetClimbingState()
-    {
-        if (_climbingConditons.IsConditionsCompleted())
-        {
-            if (_isClimbing)
+            if (_isAttacking == false)
             {
-                if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.S))
+                if (_characterCollideDetector.IsLadderColided)
                 {
-                    Debug.Log("!!!!");
-                    TryChangeState(_climbingState);
+                    ResetBools();
+                    _isClimbing = true;
+                    return;
                 }
                 else
                 {
                     _isClimbing = false;
                 }
             }
-
         }
-    }
-
-    private void TryChangeState(EntityState state)
-    {
-        if (_stateMachine.CurrentState != state)
+        else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.Space))
         {
-            _stateMachine.ChangeState(state);
+            if (_isClimbing)
+            {
+                _character.Jumper.ResetModifier();
+                _isClimbing = false;
+                _isJumping = true;
+
+                Debug.Log("Walking " + _isWalking);
+                Debug.Log("Jumping " + _isJumping);
+                Debug.Log("Attacking " + _isAttacking);
+                Debug.Log("Climbing " + _isClimbing);
+            }
+        }
+
+        if (_isWalking == false && _isAttacking == false && _isClimbing == false && _isJumping == false)
+        {
+            _isIdle = true;
+        }
+        else
+        {
+            _isIdle = false;
         }
     }
 
-    private void ApplyStateActions()
+    private void PerformWalkingAction()
     {
-        _stateMachine.CurrentState.FrameUpdate();
+        if (_isWalking)
+        {
+            _character.DirectionSwitcher.SetDirection(Input.GetAxis("Horizontal"));
+            _character.Mover.MoveHorizontal(_character.GroundSpeed * _character.DirectionSwitcher.Direction);
+            _character.AnimationSwitcher.TrySetAnimation("Walk", true);
+        }
     }
 
-    private void TrySetState()
+    private void PerformJumpAction()
     {
-        TrySetIdleState();
-        TrySetWalkintState();
-        TrySetJumpingState();
-        TrySetAttackingState();
-        TrySetClimbingState();
+        if (_isJumping)
+        {
+            _character.Jumper.Jump();
+
+            string animationName = _character.Jumper.VerticalSpeed >= 0 ? "Jump_up" : "Jump_down";
+
+            _character.AnimationSwitcher.TrySetAnimation(animationName, true);
+        }
     }
 
-    private void UpdateConditions()
+    private void PerformAttackAction()
     {
-        _idleConditions.UpdateConditionsStatus(_isWalking, _isJumping, _isAttacking, _isClimbing);
-        _walkConditions.UpdateConditionsStatus(_isJumping, _isAttacking, _isClimbing);
-        _jumpConditions.UpdateConditionsStatus(_isJumping, _isAttacking, _isClimbing);
-        _attackConditions.UpdateConditionsStatus(_isAttacking, _isJumping, _isClimbing);
-        _climbingConditons.UpdateConditionsStatus(_isAttacking, !_isClimbing);
+        if (_isAttacking)
+        {
+            _character.AnimationSwitcher.TrySetAnimation("RangeAttack", false);
+            _character.Attacker.ApplyAttack(_character.DirectionSwitcher.Direction);
+            _isAttacking = false;
+        }
     }
 
-    private void InitConditions()
+    private void PerformClimbingAction()
     {
-        _idleConditions = new Conditions();
-        _walkConditions = new Conditions();
-        _jumpConditions = new Conditions();
-        _attackConditions = new Conditions();
-        _climbingConditons = new Conditions();
-
-        UpdateConditions();
+        if (_isClimbing)
+        {
+            _character.RigidBody.gravityScale = 0;
+            _character.Mover.MoveVecrtiacal(3 * Input.GetAxis("Vertical"));
+        }
+        else
+        {
+            _character.RigidBody.gravityScale = 1;
+        }
     }
 
-    private void InitStateMachine()
+    private void PerformIdleAction()
     {
-        _stateMachine = new StateMachine();
-        _idleState = new IdleState(_character, _stateMachine);
-        _walkingState = new WalkingState(_character, _stateMachine);
-        _jumpingState = new JumpingState(_character, _stateMachine);
-        _attackState = new AttackCharacterState(_character, _stateMachine);
-        _climbingState = new ClimbingState(_character, _stateMachine);
-
-        _stateMachine.Init(_idleState);
+        if (_isIdle)
+        {
+            _character.AnimationSwitcher.TrySetAnimation("Idle", true);
+        }
     }
 }

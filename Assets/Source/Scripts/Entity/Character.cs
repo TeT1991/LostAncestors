@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Mover))]
@@ -13,7 +14,7 @@ public class Character : Entity, IDamagable
 
     private float _groundSpeed;
     private float _airHorizontalSpeed;
-    private float _jumpHeight;
+    private float _jumpPower;
     private float _reloadTime;
     private Projectile _rangeProjectile;
     private Projectile _meleeProjectile;
@@ -24,6 +25,7 @@ public class Character : Entity, IDamagable
     private CharacterCollideDetector _collideDetector;
     private DirectionSwitcher _directionSwitcher;
     private CharacterStatesHandle _characterStatesSwitchCheck;
+    private Inventory _inventory;
 
     private Rigidbody2D _rigidBody;
 
@@ -41,6 +43,7 @@ public class Character : Entity, IDamagable
     public Attacker Attacker => _attacker;
     public CharacterCollideDetector CollideDetector => _collideDetector;
     public DirectionSwitcher DirectionSwitcher => _directionSwitcher;
+    public Inventory Inventory => _inventory;
     public Rigidbody2D RigidBody => _rigidBody;
 
     protected override void LoadConfig()
@@ -49,7 +52,7 @@ public class Character : Entity, IDamagable
 
         _groundSpeed = Config.GroundSpeed;
         _airHorizontalSpeed = Config.AirHorizontalSpeed;
-        _jumpHeight = Config.JumpPower;
+        _jumpPower = Config.JumpPower;
         _reloadTime = Config.ReloadTime;
         _rangeProjectile = Config.RangeProjectile;
         _meleeProjectile = Config.MeleeProjectile;
@@ -68,21 +71,22 @@ public class Character : Entity, IDamagable
 
         _directionSwitcher = new DirectionSwitcher();
 
-        _jumper.Init(_jumpHeight, _rigidBody);
+        _jumper.Init(_jumpPower, _rigidBody);
         _attacker.Init(_reloadTime);
         _directionSwitcher.Init(Config.StartDirection);
         _collideDetector.Init(_directionSwitcher, _directionSwitcher.Direction);
         _characterStatesSwitchCheck.Init(this);
+        _inventory.Init();
 
-        _collideDetector.PlatformCollided += _characterStatesSwitchCheck.SetJumpingStatus;
-        _collideDetector.LadderColided += _characterStatesSwitchCheck.SetClimbingStatus;
+        //_collideDetector.PlatformCollided += _characterStatesSwitchCheck.SetJumpingStatus;
+        //_collideDetector.LadderColided += _characterStatesSwitchCheck.SetClimbingStatus;
         _collideDetector.ProjectileCollided += ApplyDamage;
         _collideDetector.PickaleCollided += TryPickUp;
         _collideDetector.InteractableCollided += SetCurrentInteractable;
 
         _directionSwitcher.DirectionChanged += FlipSprites;
         _directionSwitcher.DirectionChanged += _collideDetector.SetDirection;
-        _attacker.Reloaded += () => _characterStatesSwitchCheck.SetAttackStatus(false);
+        // _attacker.Reloaded += () => _characterStatesSwitchCheck.SetAttackStatus(false);
 
         OwnerType = OwnerType.Character;
     }
@@ -92,9 +96,9 @@ public class Character : Entity, IDamagable
         HealthHandler.ApplyDamage(value);
     }
 
-    public void TryPickUp(Pickable pickable)
+    public void TryPickUp(Item pickable)
     {
-        if (pickable.PickableType == PickableType.Health)
+        if (pickable is HealthItem)
         {
             if (HealthHandler.Health < HealthHandler.MaxHealth)
             {
@@ -102,6 +106,11 @@ public class Character : Entity, IDamagable
                 HealthHandler.ApplyHeal(healCount);
                 pickable.PickUp();
             }
+        }
+
+        if(pickable is InventoryItem)
+        {
+           //_inventory.AddItem
         }
     }
 
@@ -117,6 +126,7 @@ public class Character : Entity, IDamagable
             if (Input.GetKey(KeyCode.E))
             {
                 _currentInteractable.Interact();
+                ResetCurrentInterractable();
             }
         }
 
@@ -159,13 +169,13 @@ public class Character : Entity, IDamagable
 
     private void OnDestroy()
     {
-        _collideDetector.PlatformCollided -= _characterStatesSwitchCheck.SetJumpingStatus;
+        // _collideDetector.PlatformCollided -= _characterStatesSwitchCheck.SetJumpingStatus;
         _collideDetector.ProjectileCollided -= ApplyDamage;
         _collideDetector.PickaleCollided -= TryPickUp;
 
         _directionSwitcher.DirectionChanged -= FlipSprites;
         _directionSwitcher.DirectionChanged -= _collideDetector.SetDirection;
-        _attacker.Reloaded -= () => _characterStatesSwitchCheck.SetAttackStatus(false);
+        //_attacker.Reloaded -= () => _characterStatesSwitchCheck.SetAttackStatus(false);
     }
 }
 
