@@ -1,173 +1,150 @@
 using Spine.Unity;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D), typeof(SkeletonAnimation))]
+[RequireComponent(typeof(Rigidbody2D))]
 public class Character : MonoBehaviour
 {
-    [SerializeField] private float _walkSpeed;
+    [SerializeField] private SkeletonAnimation _skeletonAnimation;
+    [SerializeField] private Detector _groundDetector;
     [SerializeField] private float _jumpPower;
+    [SerializeField] private float _walkSpeed;
 
-    private SkeletonAnimation _skeleton;
     private Rigidbody2D _rigidbody;
-    private EntityState _state;
+    private AnimationState _state;
 
-    private bool _isJumpingStarted = false;
-
+    private bool _isGrounded = true;
 
     private void Awake()
     {
+        _skeletonAnimation.Initialize(true);
         _rigidbody = GetComponent<Rigidbody2D>();
-        _skeleton = GetComponent<SkeletonAnimation>();
+        _groundDetector.OnCollided += SetIsGrounded;
     }
 
     private void Update()
     {
-        TrySwitchState();
-        ApplyStateActions();
-        Debug.Log(_state.ToString());
+        ApplyActions();
+        SwitchAnimation();
     }
 
-    private void TrySwitchState()
+    private void ApplyActions()
     {
-        if (_state != EntityState.Jumping && Input.GetKeyDown(KeyCode.Space) && _isJumpingStarted)
         {
-            StartJump();
-        }
-
-        if (IsGrounded())
-        {
-            if (_state != EntityState.Jumping && _state != EntityState.Walking)
+            if (Input.GetKeyDown(KeyCode.Space) || _isGrounded == false)
             {
-                SetState(EntityState.Idle);
+                ApplyJumpActions();
+                SwitchAnimation();
+                _state = AnimationState.Jumping;
+                return;
             }
 
-            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
+            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A))
             {
-                SetState(EntityState.Walking);
+                ApplyWalkActions();
+                _state = AnimationState.Walking;
+            }
+            else
+            {
+                ApplyIdleActions();
+                _state = AnimationState.Idle;
             }
         }
     }
 
-    private void SetState(EntityState state)
+
+    private void ApplyJumpActions()
     {
-        if (_state != state)
+        Jump();
+        Move();
+        _state = AnimationState.Jumping;
+    }
+
+    private void ApplyWalkActions()
+    {
+        Move();
+        _state = AnimationState.Walking;
+    }
+
+    private void ApplyIdleActions()
+    {
+        _state = AnimationState.Idle;
+    }
+
+    private void SwitchAnimation()
+    {
+        int stateIndex = 0;
+        string currentAnimationName = SetAnimationName();
+
+        if (_skeletonAnimation.AnimationName != currentAnimationName)
         {
-            _state = state;
+            _skeletonAnimation.AnimationState.SetAnimation(stateIndex, currentAnimationName, true);
         }
     }
 
-    private void ApplyStateActions()
+    private string SetAnimationName()
     {
-        switch (_state)
+        string upAnimationName = "Jump_up";
+        string downAnimationName = "Jump_down";
+        string idleAnimationName = "Idle";
+        string walkAnimatonName = "Walk";
+        string emptyName = "";
+
+        if (_state == AnimationState.Jumping)
         {
-            case EntityState.Jumping:
-                ApplyJumpingStateActions();
+            if (_rigidbody.velocity.y > 0)
+            {
+                return upAnimationName;
+            }
+
+            if (_rigidbody.velocity.y < 0)
+            {
+                return downAnimationName;
+            }
+        }
+
+        if (_state == AnimationState.Walking)
+        {
+            return walkAnimatonName;
+        }
+
+        if (_state == AnimationState.Idle)
+        {
+            return idleAnimationName;
+        }
+
+        return emptyName;
+    }
+
+    private void Move()
+    {
+        transform.position += _walkSpeed * Input.GetAxis("Horizontal") * Time.deltaTime * Vector3.right;
+
+        SetOrientation();
+    }
+
+    private void SetOrientation()
+    {
+        switch (Input.GetAxis("Horizontal"))
+        {
+            case > 0:
+                transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
                 break;
-
-            case EntityState.Walking:
-                ApplyWalkingStateActions();
-                break;
-
-            case EntityState.Idle:
-                ApplyIdleStateActions();
+            case < 0:
+                transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
                 break;
         }
     }
 
-    private void ApplyJumpingStateActions()
+    private void Jump()
     {
-        string animationName = string.Empty;
-        bool isAnimationLooping = true;
-
-        if (_rigidbody.velocity.y > 0)
+        if ((Mathf.Abs(_rigidbody.velocity.y) == 0))
         {
-            animationName = "Jump_up";
-        }
-
-        if (_rigidbody.velocity.y < 0)
-        {
-            animationName = "Jump_down";
-        }
-
-        if (animationName != string.Empty)
-        {
-            SwitchAnimation(animationName, isAnimationLooping);
-        }
-
-        MoveHorizontal();
-    }
-
-    private void ApplyWalkingStateActions()
-    {
-        string animationName = "Walk";
-        bool isAnimationLooping = true;
-        SwitchAnimation(animationName, isAnimationLooping);
-        MoveHorizontal();
-    }
-
-    private void ApplyIdleStateActions()
-    {
-        string animationName = "Idle";
-        bool isAnimationLooping = true;
-        SwitchAnimation(animationName, isAnimationLooping);
-    }
-
-    private void MoveHorizontal()
-    {
-        transform.position += (Vector3)(CalculateHorizontalSpeed() * Time.deltaTime * Vector2.right);
-
-        FlipSkeletonToDirection();
-    }
-
-    private float CalculateHorizontalSpeed()
-    {
-        return _walkSpeed * Input.GetAxis("Horizontal");
-    }
-
-    private void SwitchAnimation(string animationName, bool isLooping)
-    {
-        int animationTrackIndex = 0;
-
-        if (_skeleton.AnimationName != animationName)
-        {
-            _skeleton.AnimationState.SetAnimation(animationTrackIndex, animationName, isLooping);
+            _rigidbody.AddForce(Vector2.up * _jumpPower, ForceMode2D.Impulse);
         }
     }
 
-    private void StartJump()
+    private void SetIsGrounded(bool isGrounded)
     {
-        _rigidbody.AddForce(Vector2.up * _jumpPower, ForceMode2D.Impulse);
-
-        SetState(EntityState.Jumping);
-    }
-
-    private void FlipSkeletonToDirection()
-    {
-        float direction = Input.GetAxis("Horizontal");
-
-        if (direction > 0)
-        {
-            _skeleton.initialFlipX = false;
-        }
-        if (direction < 0)
-        {
-            _skeleton.initialFlipX = true;
-        }
-    }
-
-    private bool IsGrounded()
-    {
-        float treshold = 0.01f;
-        return Mathf.Abs(_rigidbody.velocity.y) < treshold;
+        _isGrounded = isGrounded;
     }
 }
-
-public enum EntityState
-{
-    Idle,
-    Walking,
-    Jumping
-}
-
