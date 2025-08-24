@@ -6,11 +6,13 @@ public class Character : MonoBehaviour
 {
     [SerializeField] private SkeletonAnimation _skeletonAnimation;
     [SerializeField] private Detector _groundDetector;
+    [SerializeField] private Rotater _rotater;
     [SerializeField] private float _jumpPower;
     [SerializeField] private float _walkSpeed;
 
     private Rigidbody2D _rigidbody;
     private AnimationState _state;
+    private InputReader _inputReader;
 
     private bool _isGrounded = true;
 
@@ -19,18 +21,19 @@ public class Character : MonoBehaviour
         _skeletonAnimation.Initialize(true);
         _rigidbody = GetComponent<Rigidbody2D>();
         _groundDetector.OnCollided += SetIsGrounded;
+        _inputReader = new InputReader();
     }
 
     private void Update()
     {
-        ApplyActions();
+        ApplyActions(_inputReader.GetPressedButton());
         SwitchAnimation();
     }
 
-    private void ApplyActions()
+    private void ApplyActions(KeyCode pressedButton)
     {
         {
-            if (Input.GetKeyDown(KeyCode.Space) || _isGrounded == false)
+            if (pressedButton == KeyCode.Space || _isGrounded == false)
             {
                 ApplyJumpActions();
                 SwitchAnimation();
@@ -38,19 +41,20 @@ public class Character : MonoBehaviour
                 return;
             }
 
-            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.A))
+            if (pressedButton == KeyCode.D || pressedButton == KeyCode.A)
             {
                 ApplyWalkActions();
                 _state = AnimationState.Walking;
+                return;
             }
-            else
+
+            if (pressedButton == KeyCode.None)
             {
                 ApplyIdleActions();
                 _state = AnimationState.Idle;
             }
         }
     }
-
 
     private void ApplyJumpActions()
     {
@@ -119,20 +123,7 @@ public class Character : MonoBehaviour
     {
         transform.position += _walkSpeed * Input.GetAxis("Horizontal") * Time.deltaTime * Vector3.right;
 
-        SetOrientation();
-    }
-
-    private void SetOrientation()
-    {
-        switch (Input.GetAxis("Horizontal"))
-        {
-            case > 0:
-                transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-                break;
-            case < 0:
-                transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-                break;
-        }
+        _rotater.Rotate(Input.GetAxis("Horizontal"));
     }
 
     private void Jump()

@@ -6,6 +6,7 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     [SerializeField] private SkeletonAnimation _skeletonAnimation;
+    [SerializeField] private Rotater _rotater;
     [SerializeField] private Transform _holeDetector;
     [SerializeField] private float _jumpPower;
     [SerializeField] private float _walkSpeed;
@@ -36,7 +37,7 @@ public class Enemy : MonoBehaviour
     private void SwitchAnimation()
     {
         int stateIndex = 0;
-        string currentAnimationName = SetAnimationName();
+        string currentAnimationName = GetAnimationName();
 
         if (_skeletonAnimation.AnimationName != currentAnimationName)
         {
@@ -57,7 +58,7 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    private string SetAnimationName()
+    private string GetAnimationName()
     {
         string walkAnimatonName = "Walk";
         string emptyName = "";
@@ -76,19 +77,6 @@ public class Enemy : MonoBehaviour
 
         transform.position += _walkSpeed * _direction * Time.deltaTime * Vector3.right;
 
-        SetOrientation();
-    }
-
-    private void SetOrientation()
-    {
-        switch (_direction)
-        {
-            case > 0:
-                transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-                break;
-            case < 0:
-                transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-                break;
-        }
+        _rotater.Rotate(_direction);
     }
 }
