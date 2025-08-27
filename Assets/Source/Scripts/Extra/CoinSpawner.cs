@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -17,17 +16,25 @@ public class CoinSpawner : MonoBehaviour
     {
         _pool = new(
             createFunc: () => Instantiate(_coinPrefab),
-            actionOnGet: (obj) => ActionOnGet(obj),
-            actionOnRelease: (obj) => obj.gameObject.SetActive(false)
+            actionOnGet: (obj) => ApplyActionOnGet(obj),
+            actionOnRelease: (obj) => ApplyActionOnRelease(obj),
+            actionOnDestroy: (obj) => Destroy(obj)
             );
 
         _coroutine = StartCoroutine(Spawn());
     }
 
-    private void ActionOnGet(Coin coin)
+    private void ApplyActionOnGet(Coin coin)
     {
         coin.transform.position = CalculateSpawnPositoin();
         coin.gameObject.SetActive(true);
+        coin.OnCollected += _pool.Release;
+    }
+
+    private void ApplyActionOnRelease(Coin coin)
+    {
+        coin.gameObject.SetActive(false);
+        coin.OnCollected -= _pool.Release;
     }
 
     private Vector2 CalculateSpawnPositoin()
@@ -38,9 +45,11 @@ public class CoinSpawner : MonoBehaviour
 
     private IEnumerator Spawn()
     {
-        while (true)
+        WaitForSeconds waitForSeconds = new WaitForSeconds(_spawnTime);
+
+        while (enabled)
         {
-            yield return new WaitForSeconds (_spawnTime);
+            yield return waitForSeconds;
             _pool.Get();
         }
     }

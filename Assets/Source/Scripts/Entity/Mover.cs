@@ -1,17 +1,17 @@
 using System;
 using UnityEngine;
 
-public class EntityMover
+public class Mover
 {
-    private readonly Entity _entity;
+    private readonly Rigidbody2D _rigidbody2D;
     private int _direction;
     private bool _canMove;
 
     public event Action<int> OnDirecctionChanged;
 
-    public EntityMover(Entity entity)
+    public Mover(Rigidbody2D rigidboy)
     {
-        _entity = entity;
+        _rigidbody2D = rigidboy;
         DenyMove();
     }
 
@@ -19,10 +19,13 @@ public class EntityMover
     {
         if (_canMove)
         {
-            float deltaX = speed * Time.deltaTime * _direction;
-            float newXPosition = _entity.transform.position.x + deltaX;
-            _entity.transform.position = new Vector3(newXPosition,
-                _entity.transform.position.y, _entity.transform.position.z);
+            float deltaX = speed * _direction;
+
+            _rigidbody2D.velocity = new Vector2(deltaX, _rigidbody2D.velocity.y);
+        }
+        else
+        {
+            _rigidbody2D.velocity = new Vector2(0, _rigidbody2D.velocity.y);
         }
     }
 
@@ -41,5 +44,4 @@ public class EntityMover
     {
         _canMove = false;
     }
-
 }

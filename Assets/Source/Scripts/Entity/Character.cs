@@ -2,42 +2,48 @@ using Spine.Unity;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(InputReader))]
-public class EntityCharacter : Entity
+[RequireComponent(typeof(InputReader), typeof(Rigidbody2D))]
+public class Character : MonoBehaviour
 {
     [SerializeField] private Rigidbody2D _rigidBody;
     [SerializeField] private InputReader _inputReader;
     [SerializeField] private SkeletonAnimation _skeletonAnimation;
     [SerializeField] private GroundDetector _groundDetector;
+
+    [SerializeField] private float _moveSpeed;
     [SerializeField] private float _jumpPower;
 
-    private readonly string _walkAnimationName = "Walk";
-    private readonly string _jumpAnimationName = "Jump_up";
-    private readonly string _idleAnimationName = "Idle";
-
-    private EntityJumper _entityJumper;
-    private EntityRotater _entityRotater;
+    private EntityJumper _jumper;
+    private Rotater _rotater;
+    private Mover _mover;
+    private AnimationSwitcher _animationSwitcher;
 
     private List<ButtonType> _commands;
 
-
-    protected override void Update()
+    private void Awake()
     {
-        base.Update();
+        Init();
     }
 
-    protected override void Init()
+    private void FixedUpdate()
     {
-        base.Init();
+        _mover.Move(_moveSpeed);
+        SetAnimationByAction();
+    }
 
-        _entityJumper = new(_rigidBody);
-        _entityRotater = new(this);
+    private void Init()
+    {
+        _mover = new(_rigidBody);
+        _jumper = new(_rigidBody);
+        _rotater = new(gameObject.transform);
+        _animationSwitcher = new(_skeletonAnimation);
         _commands = new();
 
         _inputReader.OnButtonPressed += AddCommand;
         _inputReader.OnButtonReleased += RemoveCommand;
 
-        _groundDetector.OnGroundDetected += _entityJumper.TryAllowJump;
+        _groundDetector.OnGroundDetected += _jumper.AllowJump;
+        _groundDetector.OnGroundNotDetected += _jumper.DenyJump;
     }
 
     private void AddCommand(ButtonType buttonType)
@@ -46,7 +52,7 @@ public class EntityCharacter : Entity
         {
             if (buttonType == ButtonType.Jump)
             {
-                if (_entityJumper.CanJump)
+                if (_jumper.CanJump)
                 {
                     _commands.Insert(0, buttonType);
                 }
@@ -85,7 +91,7 @@ public class EntityCharacter : Entity
             if (direction != 0)
             {
                 StartMove(direction);
-                _entityRotater.Rotate(direction);
+                _rotater.Rotate(direction);
             }
             else
             {
@@ -97,49 +103,48 @@ public class EntityCharacter : Entity
             StopMove();
         }
 
-        if (_commands.Contains(ButtonType.Jump) && _entityJumper.CanJump)
+        if (_commands.Contains(ButtonType.Jump) && _jumper.CanJump)
         {
             Jump();
         }
 
-        SetAnimationByAction();
+        //SetAnimationByAction();
     }
 
     private void Jump()
     {
-        _entityJumper.Jump(_jumpPower);
+        _jumper.Jump(_jumpPower);
     }
 
     private void SetAnimationByAction()
     {
-        if (_commands.Count > 0)
+        if (_jumper.CanJump == false)
         {
-            if (_entityJumper.CanJump == false)
-            {
-                AnimationSwitcher.SetAnimation(_jumpAnimationName, true);
-                return;
-            }
+            _animationSwitcher.SetJumpAnimation();
+            return;
+        }
 
-            else if (_commands[0] == ButtonType.Walk_right || _commands[0] == ButtonType.Walk_left)
-            {
-                AnimationSwitcher.SetAnimation(_walkAnimationName, true);
-                return;
-            }
+        bool walking = _commands.Contains(ButtonType.Walk_right) ||
+                       _commands.Contains(ButtonType.Walk_left);
+
+        if (walking)
+        {
+            _animationSwitcher.SetWalkAnimation();
         }
         else
         {
-            AnimationSwitcher.SetAnimation(_idleAnimationName, true);
+            _animationSwitcher.SetIdleAnimation();
         }
     }
 
     private void StartMove(int direction)
     {
-        EntityMover.SetDirection(direction);
-        EntityMover.AllowMove();
+        _mover.SetDirection(direction);
+        _mover.AllowMove();
     }
 
     private void StopMove()
     {
-        EntityMover.DenyMove();
+        _mover.DenyMove();
     }
 }

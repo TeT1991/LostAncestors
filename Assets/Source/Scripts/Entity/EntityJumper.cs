@@ -12,7 +12,7 @@ public class EntityJumper
     public EntityJumper(Rigidbody2D rigidbody)
     {
         _rigidbody = rigidbody;
-        TryAllowJump(true);
+        AllowJump();
     }
 
     public void Jump(float jumpPower)
@@ -20,12 +20,17 @@ public class EntityJumper
         if(_canJump)
         {
             _rigidbody.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
-            TryAllowJump(false);
+            DenyJump();
         }
     }
 
-    public void TryAllowJump(bool value)
+    public void AllowJump()
     {
-        _canJump = value;
+        _canJump = true;
+    }
+
+    public void DenyJump()
+    {
+        _canJump = false;
     }
 }
