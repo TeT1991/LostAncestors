@@ -5,43 +5,26 @@ public class Mover
 {
     private readonly Rigidbody2D _rigidbody2D;
     private int _direction;
-    private bool _canMove;
+    private float _speed;
 
     public event Action<int> OnDirecctionChanged;
 
-    public Mover(Rigidbody2D rigidboy)
+    public Mover(Rigidbody2D rigidboy, float speed)
     {
         _rigidbody2D = rigidboy;
-        DenyMove();
+        _speed = speed;
     }
 
-    public void Move(float speed)
+    public void Move()
     {
-        if (_canMove)
-        {
-            float deltaX = speed * _direction;
+        float deltaX = _speed * _direction;
 
-            _rigidbody2D.velocity = new Vector2(deltaX, _rigidbody2D.velocity.y);
-        }
-        else
-        {
-            _rigidbody2D.velocity = new Vector2(0, _rigidbody2D.velocity.y);
-        }
+        _rigidbody2D.velocity = new Vector2(deltaX, _rigidbody2D.velocity.y);
     }
 
     public void SetDirection(int direction)
     {
         _direction = direction;
         OnDirecctionChanged?.Invoke(_direction);
-    }
-
-    public void AllowMove()
-    {
-        _canMove = true;
-    }
-
-    public void DenyMove()
-    {
-        _canMove = false;
     }
 }

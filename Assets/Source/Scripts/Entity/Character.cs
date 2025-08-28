@@ -13,10 +13,13 @@ public class Character : MonoBehaviour
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _jumpPower;
 
-    private EntityJumper _jumper;
+    private Jumper _jumper;
     private Rotater _rotater;
     private Mover _mover;
     private AnimationSwitcher _animationSwitcher;
+
+    private bool _canMove;
+    private bool _canJump;
 
     private List<ButtonType> _commands;
 
@@ -25,16 +28,25 @@ public class Character : MonoBehaviour
         Init();
     }
 
+    private void OnDestroy()
+    {
+        _inputReader.OnButtonPressed -= AddCommand;
+        _inputReader.OnButtonReleased -= RemoveCommand;
+
+        _groundDetector.OnGroundDetected -= AllowJump;
+        _groundDetector.OnGroundNotDetected -= DenyJump;
+    }
+
     private void FixedUpdate()
     {
-        _mover.Move(_moveSpeed);
+        Move();
         SetAnimationByAction();
     }
 
     private void Init()
     {
-        _mover = new(_rigidBody);
-        _jumper = new(_rigidBody);
+        _mover = new(_rigidBody, _moveSpeed);
+        _jumper = new(_rigidBody, _jumpPower);
         _rotater = new(gameObject.transform);
         _animationSwitcher = new(_skeletonAnimation);
         _commands = new();
@@ -42,8 +54,8 @@ public class Character : MonoBehaviour
         _inputReader.OnButtonPressed += AddCommand;
         _inputReader.OnButtonReleased += RemoveCommand;
 
-        _groundDetector.OnGroundDetected += _jumper.AllowJump;
-        _groundDetector.OnGroundNotDetected += _jumper.DenyJump;
+        _groundDetector.OnGroundDetected += AllowJump;
+        _groundDetector.OnGroundNotDetected += DenyJump;
     }
 
     private void AddCommand(ButtonType buttonType)
@@ -52,7 +64,7 @@ public class Character : MonoBehaviour
         {
             if (buttonType == ButtonType.Jump)
             {
-                if (_jumper.CanJump)
+                if (_canJump)
                 {
                     _commands.Insert(0, buttonType);
                 }
@@ -103,22 +115,16 @@ public class Character : MonoBehaviour
             StopMove();
         }
 
-        if (_commands.Contains(ButtonType.Jump) && _jumper.CanJump)
+        if (_commands.Contains(ButtonType.Jump) && _canJump)
         {
             Jump();
         }
-
-        //SetAnimationByAction();
     }
 
-    private void Jump()
-    {
-        _jumper.Jump(_jumpPower);
-    }
 
     private void SetAnimationByAction()
     {
-        if (_jumper.CanJump == false)
+        if (_canJump == false)
         {
             _animationSwitcher.SetJumpAnimation();
             return;
@@ -140,11 +146,38 @@ public class Character : MonoBehaviour
     private void StartMove(int direction)
     {
         _mover.SetDirection(direction);
-        _mover.AllowMove();
+        _canMove = true;
     }
 
     private void StopMove()
     {
-        _mover.DenyMove();
+        _canMove = false;
+    }
+
+    private void Move()
+    {
+        if (_canMove)
+        {
+            _mover.Move();
+        }
+    }
+
+    private void AllowJump()
+    {
+        _canJump = true;
+    }
+
+    private void DenyJump()
+    {
+        _canJump = false;
+    }
+
+    private void Jump()
+    {
+        if (_canJump)
+        {
+           _jumper.Jump();
+            DenyJump();
+        }
     }
 }

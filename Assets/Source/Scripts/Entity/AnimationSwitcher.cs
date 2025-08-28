@@ -16,36 +16,28 @@ public class AnimationSwitcher
     public void SetIdleAnimation()
     {
         bool isLooping = true;
-
-        if (_skeletonAnimation.AnimationName != _idleAnimationName)
-        {
-            int stateIndex = 0;
-
-            _skeletonAnimation.state.SetAnimation(stateIndex, _idleAnimationName, isLooping);
-        }
+        SetAnimation(_idleAnimationName, isLooping);
     }
 
     public void SetWalkAnimation()
     {
         bool isLooping = true;
-
-        if (_skeletonAnimation.AnimationName != _walkAnimationName)
-        {
-            int stateIndex = 0;
-
-            _skeletonAnimation.state.SetAnimation(stateIndex, _walkAnimationName, isLooping);
-        }
+        SetAnimation(_walkAnimationName, isLooping);
     }
 
     public void SetJumpAnimation()
     {
         bool isLooping = true;
+        SetAnimation(_jumpAnimationName, isLooping);
+    }
 
-        if (_skeletonAnimation.AnimationName != _jumpAnimationName)
+    private void SetAnimation(string animationName, bool isLooping)
+    {
+        if (_skeletonAnimation.AnimationName != animationName)
         {
             int stateIndex = 0;
 
-            _skeletonAnimation.state.SetAnimation(stateIndex, _jumpAnimationName, isLooping);
+            _skeletonAnimation.state.SetAnimation(stateIndex, animationName, isLooping);
         }
     }
 }

@@ -13,7 +13,11 @@ public class Enemy : MonoBehaviour
     private Rotater _rotater;
     private Mover _mover;
     private AnimationSwitcher _animationSwitcher;
+    private Patroller _patroller;
+
+    private EnemyState _state;
     private int _direction;
+    private bool _canMove;
 
     private void Awake()
     {
@@ -22,22 +26,31 @@ public class Enemy : MonoBehaviour
 
     private void FixedUpdate()
     {
-        _mover.Move(_moveSpeed);
+        ApplyStateActions();
+    }
+
+    private void OnDestroy()
+    {
+        _holeDetector.OnHoleDetected -= SwitchDirection;
     }
 
     private void Init()
     {
         _direction = -1;
+        _canMove = false;
 
         _rigidbody = GetComponent<Rigidbody2D>();
-        _mover = new(_rigidbody);
+        _mover = new(_rigidbody,_moveSpeed);
         _rotater = new(gameObject.transform);
         _animationSwitcher = new(_skeletonAnimation);
+        _patroller = new(_mover);
+
         _holeDetector.OnHoleDetected += SwitchDirection;
         _rotater.Rotate(_direction);
         _mover.SetDirection(_direction);
-        _mover.AllowMove();
         _animationSwitcher.SetWalkAnimation();
+        AllowMove();
+        _state = EnemyState.Patroling;
     }
 
     private void SwitchDirection()
@@ -45,5 +58,20 @@ public class Enemy : MonoBehaviour
         _direction *= -1;
         _rotater.Rotate(_direction);
         _mover.SetDirection(_direction);
+    }
+
+    private void AllowMove()
+    {
+        _canMove = true;
+    }
+
+    private void ApplyStateActions()
+    {
+        switch ( _state)
+        {
+            case EnemyState.Patroling:
+                _patroller.Patrol();
+                break; 
+        }
     }
 }
