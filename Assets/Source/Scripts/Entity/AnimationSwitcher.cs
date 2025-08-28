@@ -13,19 +13,19 @@ public class AnimationSwitcher
         _skeletonAnimation.Initialize(true);
     }
 
-    public void SetIdleAnimation()
+    public void PlayIdleAnimation()
     {
         bool isLooping = true;
         SetAnimation(_idleAnimationName, isLooping);
     }
 
-    public void SetWalkAnimation()
+    public void PlayWalkAnimation()
     {
         bool isLooping = true;
         SetAnimation(_walkAnimationName, isLooping);
     }
 
-    public void SetJumpAnimation()
+    public void PlayJumpAnimation()
     {
         bool isLooping = true;
         SetAnimation(_jumpAnimationName, isLooping);

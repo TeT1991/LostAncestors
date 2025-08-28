@@ -40,7 +40,7 @@ public class Character : MonoBehaviour
     private void FixedUpdate()
     {
         Move();
-        SetAnimationByAction();
+        ChangeAnimationByAction();
     }
 
     private void Init()
@@ -75,17 +75,17 @@ public class Character : MonoBehaviour
             }
         }
 
-        ReactOnInput();
+        ExecuteCommand();
     }
 
     private void RemoveCommand(ButtonType buttonType)
     {
         _commands.Remove(buttonType);
 
-        ReactOnInput();
+        ExecuteCommand();
     }
 
-    private void ReactOnInput()
+    private void ExecuteCommand()
     {
         int direction = 0;
 
@@ -121,12 +121,11 @@ public class Character : MonoBehaviour
         }
     }
 
-
-    private void SetAnimationByAction()
+    private void ChangeAnimationByAction()
     {
         if (_canJump == false)
         {
-            _animationSwitcher.SetJumpAnimation();
+            _animationSwitcher.PlayJumpAnimation();
             return;
         }
 
@@ -135,11 +134,11 @@ public class Character : MonoBehaviour
 
         if (walking)
         {
-            _animationSwitcher.SetWalkAnimation();
+            _animationSwitcher.PlayWalkAnimation();
         }
         else
         {
-            _animationSwitcher.SetIdleAnimation();
+            _animationSwitcher.PlayIdleAnimation();
         }
     }
 

@@ -48,7 +48,7 @@ public class Enemy : MonoBehaviour
         _holeDetector.OnHoleDetected += SwitchDirection;
         _rotater.Rotate(_direction);
         _mover.SetDirection(_direction);
-        _animationSwitcher.SetWalkAnimation();
+        _animationSwitcher.PlayWalkAnimation();
         AllowMove();
         _state = EnemyState.Patroling;
     }
