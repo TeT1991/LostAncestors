@@ -9,9 +9,12 @@ public class Character : MonoBehaviour
     [SerializeField] private InputReader _inputReader;
     [SerializeField] private SkeletonAnimation _skeletonAnimation;
     [SerializeField] private GroundDetector _groundDetector;
+    [SerializeField] private PickableDetector _pickableDetector;
 
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _jumpPower;
+    private int _maxHealth = 3;
+    private int _health = 1;
 
     private Jumper _jumper;
     private Rotater _rotater;
@@ -35,6 +38,8 @@ public class Character : MonoBehaviour
 
         _groundDetector.OnGroundDetected -= AllowJump;
         _groundDetector.OnGroundNotDetected -= DenyJump;
+
+        _pickableDetector.OnPicked -= TryPickUp;
     }
 
     private void FixedUpdate()
@@ -56,6 +61,9 @@ public class Character : MonoBehaviour
 
         _groundDetector.OnGroundDetected += AllowJump;
         _groundDetector.OnGroundNotDetected += DenyJump;
+
+        _pickableDetector.OnPicked += TryPickUp;
+        
     }
 
     private void AddCommand(ButtonType buttonType)
@@ -142,6 +150,19 @@ public class Character : MonoBehaviour
         }
     }
 
+    private void TryPickUp(IPickable pickable)
+    {
+        if (pickable.GetPickableType() == PickableType.Medkit)
+        {
+            if (_health < _maxHealth)
+            {
+                IncreaseHealth();
+                pickable.PickUp();
+
+            }
+        }
+    }
+
     private void StartMove(int direction)
     {
         _mover.SetDirection(direction);
@@ -175,8 +196,18 @@ public class Character : MonoBehaviour
     {
         if (_canJump)
         {
-           _jumper.Jump();
+            _jumper.Jump();
             DenyJump();
         }
+    }
+
+    private void IncreaseHealth()
+    {
+        _health++;
+    }
+
+    private void DecreaseHealth()
+    {
+        _health--;
     }
 }
