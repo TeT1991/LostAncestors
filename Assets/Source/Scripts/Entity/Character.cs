@@ -5,6 +5,8 @@ using UnityEngine;
 [RequireComponent(typeof(InputReader), typeof(Rigidbody2D))]
 public class Character : MonoBehaviour
 {
+    private readonly int _maxHealth = 3;
+
     [SerializeField] private Rigidbody2D _rigidBody;
     [SerializeField] private InputReader _inputReader;
     [SerializeField] private SkeletonAnimation _skeletonAnimation;
@@ -13,7 +15,6 @@ public class Character : MonoBehaviour
 
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _jumpPower;
-    private int _maxHealth = 3;
     private int _health = 1;
 
     private Jumper _jumper;

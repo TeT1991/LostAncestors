@@ -1,4 +1,5 @@
 public enum EnemyState
 {
-    Patroling
+    Patroling,
+    Chasing
 }

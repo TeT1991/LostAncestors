@@ -8,7 +8,6 @@ public class Medkit : MonoBehaviour, IPickable
     public event Action<Medkit> OnCollected;
     public void PickUp()
     {
-        Debug.Log("PICKUP");
        OnCollected?.Invoke(this);   
     }
 
