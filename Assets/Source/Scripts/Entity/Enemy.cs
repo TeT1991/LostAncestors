@@ -4,7 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, IDamagable
 {
     [SerializeField] private HoleDetector _holeDetector;
     [SerializeField] private CharacterDetector _characterDetector;
@@ -32,6 +32,7 @@ public class Enemy : MonoBehaviour
 
     private EnemyState _state;
     private int _direction;
+    private int _health = 1;
     private bool _canMove;
     private bool _canAttack;
 
@@ -41,7 +42,7 @@ public class Enemy : MonoBehaviour
     }
 
     private void Update()
-    {  
+    {
         ApplyStateActions();
     }
 
@@ -59,7 +60,7 @@ public class Enemy : MonoBehaviour
         _canAttack = true;
 
         _rigidbody = GetComponent<Rigidbody2D>();
-        _mover = new(_rigidbody,_moveSpeed);
+        _mover = new(_rigidbody, _moveSpeed);
         _rotater = new(gameObject.transform);
         _animationSwitcher = new(_skeletonAnimation);
         _patroller = new(_mover);
@@ -77,7 +78,7 @@ public class Enemy : MonoBehaviour
 
         _waitForAttackReload = new WaitForSeconds(_reloadTime);
     }
-    
+
     private void SwitchDirection()
     {
         _direction *= -1;
@@ -92,7 +93,7 @@ public class Enemy : MonoBehaviour
 
     private void ApplyStateActions()
     {
-        switch ( _state)
+        switch (_state)
         {
             case EnemyState.Patroling:
                 _patroller.Patrol();
@@ -106,31 +107,33 @@ public class Enemy : MonoBehaviour
 
     private void ApplyChasingActions()
     {
+        if(_chasingObject == null)
+        {
+            return;
+        }
+
         float distance = Vector2.Distance(transform.position, _chasingObject.transform.position);
 
-        if(distance <= _chasingDistance)
+        if (distance >= _attackDistance)
         {
-            if (distance >= _attackDistance)
+            _mover.Move();
+            _animationSwitcher.PlayWalkAnimation();
+        }
+        else if (distance <= _attackDistance)
+        {
+            if (_canAttack)
             {
-                _mover.Move();
+                Attack();
+                _canAttack = false;
+                _coroutine = StartCoroutine(Reload());
+                _animationSwitcher.PlayAttackAnimation();
+            }
+            else
+            {
                 _animationSwitcher.PlayWalkAnimation();
             }
-            else if (distance <= _attackDistance)
-            {
-                if (_canAttack)
-                {
-                    Attack();
-                    _canAttack = false;
-                    _coroutine = StartCoroutine(Reload());
-                    _animationSwitcher.PlayAttackAnimation();
-                }
-                else
-                {
-                    _animationSwitcher.PlayWalkAnimation();
-
-                }
-            }
         }
+
     }
 
     private void Attack()
@@ -158,7 +161,7 @@ public class Enemy : MonoBehaviour
 
     private void SetChasingState()
     {
-        _state = EnemyState.Chasing;    
+        _state = EnemyState.Chasing;
     }
 
     private IEnumerator Reload()
@@ -166,5 +169,25 @@ public class Enemy : MonoBehaviour
         yield return _waitForAttackReload;
 
         _canAttack = true;
+    }
+
+    private void DecreaseHealth()
+    {
+        _health--;
+    }
+
+    private void Die()
+    {
+        Destroy(gameObject);
+    }
+
+    public void TakeDamage()
+    {
+        DecreaseHealth();
+
+        if (_health <= 0)
+        {
+            Die();
+        }
     }
 }

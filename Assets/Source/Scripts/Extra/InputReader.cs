@@ -7,6 +7,7 @@ public class InputReader:MonoBehaviour
     private readonly KeyCode _moveLeftButton = KeyCode.A;
     private readonly KeyCode _moveRightButton = KeyCode.D;
     private readonly KeyCode _jumpButton = KeyCode.Space;
+    private readonly KeyCode _attackButton = KeyCode.Mouse0;
 
     private readonly Dictionary<KeyCode, ButtonType> _keys;
 
@@ -19,7 +20,8 @@ public class InputReader:MonoBehaviour
         {
             { _moveRightButton, ButtonType.Walk_right },
             { _moveLeftButton, ButtonType.Walk_left },
-            { _jumpButton, ButtonType.Jump }
+            { _jumpButton, ButtonType.Jump },
+            { _attackButton, ButtonType.Attack },
         };
     }
 

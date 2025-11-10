@@ -6,7 +6,7 @@ public class AnimationSwitcher
     private readonly string _walkAnimationName = "Walk";
     private readonly string _jumpAnimationName = "Jump_up";
     private readonly string _idleAnimationName = "Idle";
-    private readonly string _attackAnimationName = "Attack";
+    private readonly string _attackAnimationName = "RangeAttack";
 
     public AnimationSwitcher(SkeletonAnimation skeletonAnimation)
     {
@@ -24,7 +24,6 @@ public class AnimationSwitcher
     {
         bool isLooping = false;
         SetAnimation(_attackAnimationName, isLooping);
-        _skeletonAnimation.state.AddAnimation(0, _idleAnimationName, true, 0);
     }
 
     public void PlayWalkAnimation()

@@ -1,29 +1,42 @@
 using Spine.Unity;
+using Spine.Unity.Examples;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(InputReader), typeof(Rigidbody2D))]
-public class Character : MonoBehaviour
+public class Character : MonoBehaviour, IDamagable
 {
     private readonly int _maxHealth = 3;
 
+    [SerializeField] private Projectile _projectilePrefab;
     [SerializeField] private Rigidbody2D _rigidBody;
     [SerializeField] private InputReader _inputReader;
     [SerializeField] private SkeletonAnimation _skeletonAnimation;
     [SerializeField] private GroundDetector _groundDetector;
     [SerializeField] private PickableDetector _pickableDetector;
+    [SerializeField] private Transform _projectileLaunchPoint;
 
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _jumpPower;
-    private int _health = 1;
+    [SerializeField] private float _reloadTime;
+    [SerializeField] private float _projectileSpeed;
+
+    private int _health = 2;
+    private WaitForSeconds _waitForAttackReload;
+    private Coroutine _coroutine;
 
     private Jumper _jumper;
     private Rotater _rotater;
     private Mover _mover;
+    private Atacker _atacker;
     private AnimationSwitcher _animationSwitcher;
+
+    private int _direction;
 
     private bool _canMove;
     private bool _canJump;
+    private bool _canAttack;
 
     private List<ButtonType> _commands;
 
@@ -34,8 +47,8 @@ public class Character : MonoBehaviour
 
     private void OnDestroy()
     {
-        _inputReader.OnButtonPressed -= AddCommand;
-        _inputReader.OnButtonReleased -= RemoveCommand;
+        _inputReader.OnButtonPressed -= StartExecuteAction;
+        _inputReader.OnButtonReleased -= StopExecuteAction;
 
         _groundDetector.OnGroundDetected -= AllowJump;
         _groundDetector.OnGroundNotDetected -= DenyJump;
@@ -46,7 +59,6 @@ public class Character : MonoBehaviour
     private void FixedUpdate()
     {
         Move();
-        ChangeAnimationByAction();
     }
 
     private void Init()
@@ -56,98 +68,54 @@ public class Character : MonoBehaviour
         _rotater = new(gameObject.transform);
         _animationSwitcher = new(_skeletonAnimation);
         _commands = new();
+        _atacker = new(_projectileLaunchPoint, _projectilePrefab);
 
-        _inputReader.OnButtonPressed += AddCommand;
-        _inputReader.OnButtonReleased += RemoveCommand;
+        _direction = 1;
+
+        _inputReader.OnButtonPressed += StartExecuteAction;
+        _inputReader.OnButtonReleased += StopExecuteAction;
 
         _groundDetector.OnGroundDetected += AllowJump;
         _groundDetector.OnGroundNotDetected += DenyJump;
 
         _pickableDetector.OnPicked += TryPickUp;
-        
+
+        _waitForAttackReload = new WaitForSeconds(_reloadTime);
+
+        AllowAttack();
+
     }
 
-    private void AddCommand(ButtonType buttonType)
+    private void StartExecuteAction(ButtonType buttonType)
     {
-        if (_commands.Contains(buttonType) == false)
+        switch (buttonType)
         {
-            if (buttonType == ButtonType.Jump)
-            {
-                if (_canJump)
-                {
-                    _commands.Insert(0, buttonType);
-                }
-            }
-            else
-            {
-                _commands.Insert(0, buttonType);
-            }
+            case ButtonType.Walk_right:
+                ApplyMoveActions(1);
+                break;
+
+            case ButtonType.Walk_left:
+                ApplyMoveActions(-1);
+                break;
+
+            case ButtonType.Jump:
+                Jump();
+                break;
+
+            case ButtonType.Attack:
+                Attack();
+                break;
         }
-
-        ExecuteCommand();
     }
 
-    private void RemoveCommand(ButtonType buttonType)
+    private void StopExecuteAction(ButtonType buttonType)
     {
-        _commands.Remove(buttonType);
-
-        ExecuteCommand();
-    }
-
-    private void ExecuteCommand()
-    {
-        int direction = 0;
-
-        if (_commands.Count > 0)
+        switch (buttonType)
         {
-            if (_commands.Contains(ButtonType.Walk_right))
-            {
-                direction = 1;
-            }
-            else if (_commands.Contains(ButtonType.Walk_left))
-            {
-                direction = -1;
-            }
-
-            if (direction != 0)
-            {
-                StartMove(direction);
-                _rotater.Rotate(direction);
-            }
-            else
-            {
+            case ButtonType.Walk_right:
+            case ButtonType.Walk_left:
                 StopMove();
-            }
-        }
-        else
-        {
-            StopMove();
-        }
-
-        if (_commands.Contains(ButtonType.Jump) && _canJump)
-        {
-            Jump();
-        }
-    }
-
-    private void ChangeAnimationByAction()
-    {
-        if (_canJump == false)
-        {
-            _animationSwitcher.PlayJumpAnimation();
-            return;
-        }
-
-        bool walking = _commands.Contains(ButtonType.Walk_right) ||
-                       _commands.Contains(ButtonType.Walk_left);
-
-        if (walking)
-        {
-            _animationSwitcher.PlayWalkAnimation();
-        }
-        else
-        {
-            _animationSwitcher.PlayIdleAnimation();
+                break;
         }
     }
 
@@ -159,20 +127,32 @@ public class Character : MonoBehaviour
             {
                 IncreaseHealth();
                 pickable.PickUp();
-
             }
         }
     }
 
-    private void StartMove(int direction)
+    private void ApplyMoveActions(int direction)
     {
-        _mover.SetDirection(direction);
+        _direction = direction;
+        StartMove();
+
+        if (_canJump)
+        {
+            _animationSwitcher.PlayWalkAnimation();
+        }
+    }
+
+    private void StartMove()
+    {
+        _mover.SetDirection(_direction);
+        _rotater.Rotate(_direction);
         _canMove = true;
     }
 
     private void StopMove()
     {
         _canMove = false;
+        _rigidBody.velocity *= Vector2.up;
     }
 
     private void Move()
@@ -180,6 +160,10 @@ public class Character : MonoBehaviour
         if (_canMove)
         {
             _mover.Move();
+        }
+        else
+        {
+            _animationSwitcher.PlayIdleAnimation();
         }
     }
 
@@ -199,7 +183,33 @@ public class Character : MonoBehaviour
         {
             _jumper.Jump();
             DenyJump();
+            _animationSwitcher.PlayJumpAnimation();
         }
+    }
+
+    private void AllowAttack()
+    {
+        _canAttack = true;
+    }
+
+    private void DenyAttack()
+    {
+        _canAttack = false;
+    }
+
+    private void Attack()
+    {
+        _atacker.LaunchProjectile(_projectileSpeed, _direction);
+        _coroutine = StartCoroutine(Reload());
+        _animationSwitcher.PlayAttackAnimation();
+        DenyAttack();
+    }
+
+    private IEnumerator Reload()
+    {
+        yield return _waitForAttackReload;
+
+        AllowAttack();
     }
 
     private void IncreaseHealth()
@@ -210,5 +220,20 @@ public class Character : MonoBehaviour
     private void DecreaseHealth()
     {
         _health--;
+    }
+
+    private void Die()
+    {
+        Destroy(gameObject);
+    }
+
+    public void TakeDamage()
+    {
+        DecreaseHealth();
+
+        if (_health <= 0)
+        {
+            Die();
+        }
     }
 }

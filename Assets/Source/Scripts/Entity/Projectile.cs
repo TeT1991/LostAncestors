@@ -23,4 +23,18 @@ public class Projectile : MonoBehaviour
     {
         transform.position += Vector3.right * _moveDistance;
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.TryGetComponent<IDamagable>(out IDamagable damagable))
+        {
+            damagable.TakeDamage();
+            Destroy(gameObject);
+        }
+
+        if (collision.TryGetComponent<Platform>(out Platform platform))
+        {
+            Destroy(gameObject);
+        }
+    }
 }
