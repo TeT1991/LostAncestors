@@ -3,13 +3,17 @@ using UnityEngine;
 
 public class GroundDetector : MonoBehaviour
 {
+    private int _collisionsCount = 0;
+
     public event Action OnGroundDetected;
     public event Action OnGroundNotDetected;
+
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.TryGetComponent<Platform>(out _))
         {
+            _collisionsCount++;
             OnGroundDetected?.Invoke();
         }
     }
@@ -18,7 +22,13 @@ public class GroundDetector : MonoBehaviour
     {
         if (collision.TryGetComponent<Platform>(out _))
         {
-            OnGroundNotDetected?.Invoke();
+            _collisionsCount--;
+
+            if (_collisionsCount <= 0)
+            {
+                _collisionsCount = 0;
+                OnGroundNotDetected?.Invoke();
+            }
         }
     }
 }
