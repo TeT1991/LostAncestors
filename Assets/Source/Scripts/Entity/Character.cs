@@ -8,6 +8,7 @@ using UnityEngine;
 public class Character : MonoBehaviour, IDamagable
 {
     private readonly int _maxHealth = 3;
+    private readonly int _startHealth = 1;
 
     [SerializeField] private Projectile _projectilePrefab;
     [SerializeField] private Rigidbody2D _rigidBody;
@@ -22,7 +23,6 @@ public class Character : MonoBehaviour, IDamagable
     [SerializeField] private float _reloadTime;
     [SerializeField] private float _projectileSpeed;
 
-    private int _health = 2;
     private WaitForSeconds _waitForAttackReload;
     private Coroutine _coroutine;
 
@@ -30,6 +30,7 @@ public class Character : MonoBehaviour, IDamagable
     private Rotater _rotater;
     private Mover _mover;
     private Atacker _atacker;
+    private Health _health;
     private AnimationSwitcher _animationSwitcher;
 
     private int _direction;
@@ -68,7 +69,9 @@ public class Character : MonoBehaviour, IDamagable
         _rotater = new(gameObject.transform);
         _animationSwitcher = new(_skeletonAnimation);
         _commands = new();
-        _atacker = new(_projectileLaunchPoint, _projectilePrefab);
+        _atacker = new(this,_projectileLaunchPoint, _projectilePrefab, _reloadTime);
+        _health = new(_startHealth, _maxHealth);
+        _inputReader.Init();
 
         _direction = 1;
 
@@ -123,9 +126,9 @@ public class Character : MonoBehaviour, IDamagable
     {
         if (pickable.GetPickableType() == PickableType.Medkit)
         {
-            if (_health < _maxHealth)
+            if (_health.CurrentHealth < _health.MaxHealth)
             {
-                IncreaseHealth();
+                Heal();
                 pickable.PickUp();
             }
         }
@@ -212,14 +215,9 @@ public class Character : MonoBehaviour, IDamagable
         AllowAttack();
     }
 
-    private void IncreaseHealth()
+    private void Heal()
     {
-        _health++;
-    }
-
-    private void DecreaseHealth()
-    {
-        _health--;
+        _health.IncreaseHealth();
     }
 
     private void Die()
@@ -229,9 +227,9 @@ public class Character : MonoBehaviour, IDamagable
 
     public void TakeDamage()
     {
-        DecreaseHealth();
+        _health.DecreaseHealth();
 
-        if (_health <= 0)
+        if (_health.CurrentHealth <= 0)
         {
             Die();
         }

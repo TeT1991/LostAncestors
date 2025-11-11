@@ -2,19 +2,25 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InputReader:MonoBehaviour
+public class InputReader : MonoBehaviour
 {
     private readonly KeyCode _moveLeftButton = KeyCode.A;
     private readonly KeyCode _moveRightButton = KeyCode.D;
     private readonly KeyCode _jumpButton = KeyCode.Space;
     private readonly KeyCode _attackButton = KeyCode.Mouse0;
 
-    private readonly Dictionary<KeyCode, ButtonType> _keys;
+    private Dictionary<KeyCode, ButtonType> _keys;
 
     public event Action<ButtonType> OnButtonPressed;
     public event Action<ButtonType> OnButtonReleased;
 
-    public InputReader()
+    private void Update()
+    {
+        DetectButtonPress();
+        DetectButtonRelease();
+    }
+
+    public void Init()
     {
         _keys = new()
         {
@@ -25,20 +31,16 @@ public class InputReader:MonoBehaviour
         };
     }
 
-    private void Update()
-    {
-        DetectButtonPress();
-        DetectButtonRelease();
-    }
-
     private void DetectButtonPress()
     {
         foreach (KeyCode key in _keys.Keys)
         {
             if (Input.GetKeyDown(key))
             {
-                _keys.TryGetValue(key, out ButtonType buttonType);
-                OnButtonPressed?.Invoke(buttonType);
+                if (_keys.TryGetValue(key, out ButtonType buttonType))
+                {
+                    OnButtonPressed?.Invoke(buttonType);
+                }
             }
         }
     }
@@ -49,8 +51,10 @@ public class InputReader:MonoBehaviour
         {
             if (Input.GetKeyUp(key))
             {
-                _keys.TryGetValue(key, out ButtonType buttonType);
-                OnButtonReleased?.Invoke(buttonType);
+                if (_keys.TryGetValue(key, out ButtonType buttonType))
+                {
+                    OnButtonReleased?.Invoke(buttonType);
+                }
             }
         }
     }

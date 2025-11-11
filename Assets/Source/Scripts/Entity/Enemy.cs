@@ -1,6 +1,6 @@
 using Spine.Unity;
+using System;
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -15,7 +15,6 @@ public class Enemy : MonoBehaviour, IDamagable
     [SerializeField] private float _projectileSpeed;
     [SerializeField] private float _reloadTime;
     [SerializeField] private float _moveSpeed;
-    [SerializeField] private float _chasingDistance;
     [SerializeField] private float _attackDistance;
 
     private Transform _chasingObject;
@@ -26,15 +25,17 @@ public class Enemy : MonoBehaviour, IDamagable
     private AnimationSwitcher _animationSwitcher;
     private Patroller _patroller;
     private Atacker _atacker;
+    private Health _health;
 
     private Coroutine _coroutine;
     private WaitForSeconds _waitForAttackReload;
 
-    private EnemyState _state;
     private int _direction;
-    private int _health = 1;
+    private int _currentHealth = 1;
     private bool _canMove;
     private bool _canAttack;
+
+    public event Action<Enemy> OnHealthOver;
 
     private void Awake()
     {
@@ -43,7 +44,7 @@ public class Enemy : MonoBehaviour, IDamagable
 
     private void Update()
     {
-        ApplyStateActions();
+        SelectAction();
     }
 
     private void OnDestroy()
@@ -51,6 +52,18 @@ public class Enemy : MonoBehaviour, IDamagable
         _holeDetector.OnHoleDetected -= SwitchDirection;
         _characterDetector.OnDetected -= SetChasingObject;
         _characterDetector.OnNotDetected -= ResetCharacter;
+    }
+
+    private void SelectAction()
+    {
+        if (_chasingObject == null)
+        {
+            _mover.Move();
+        }
+        else
+        {
+            Attack();
+        }
     }
 
     private void Init()
@@ -64,17 +77,17 @@ public class Enemy : MonoBehaviour, IDamagable
         _rotater = new(gameObject.transform);
         _animationSwitcher = new(_skeletonAnimation);
         _patroller = new(_mover);
-        _atacker = new(_projectileSpawnPoint, _projectilePrefab);
+        _atacker = new(this,_projectileSpawnPoint, _projectilePrefab, _reloadTime);
+        _health = new(_currentHealth, _currentHealth);
 
         _holeDetector.OnHoleDetected += SwitchDirection;
         _characterDetector.OnDetected += SetChasingObject;
         _characterDetector.OnNotDetected += ResetCharacter;
         _rotater.Rotate(_direction);
         _mover.SetDirection(_direction);
-        _characterDetector.Init(_chasingDistance);
+        _characterDetector.Init(_attackDistance);
         _animationSwitcher.PlayWalkAnimation();
         AllowMove();
-        _state = EnemyState.Patroling;
 
         _waitForAttackReload = new WaitForSeconds(_reloadTime);
     }
@@ -91,101 +104,31 @@ public class Enemy : MonoBehaviour, IDamagable
         _canMove = true;
     }
 
-    private void ApplyStateActions()
-    {
-        switch (_state)
-        {
-            case EnemyState.Patroling:
-                _patroller.Patrol();
-                break;
-
-            case EnemyState.Chasing:
-                ApplyChasingActions();
-                break;
-        }
-    }
-
-    private void ApplyChasingActions()
-    {
-        if(_chasingObject == null)
-        {
-            return;
-        }
-
-        float distance = Vector2.Distance(transform.position, _chasingObject.transform.position);
-
-        if (distance >= _attackDistance)
-        {
-            _mover.Move();
-            _animationSwitcher.PlayWalkAnimation();
-        }
-        else if (distance <= _attackDistance)
-        {
-            if (_canAttack)
-            {
-                Attack();
-                _canAttack = false;
-                _coroutine = StartCoroutine(Reload());
-                _animationSwitcher.PlayAttackAnimation();
-            }
-            else
-            {
-                _animationSwitcher.PlayWalkAnimation();
-            }
-        }
-
-    }
-
     private void Attack()
     {
         _atacker.LaunchProjectile(_projectileSpeed, _direction);
-
     }
 
     private void SetChasingObject(Transform chasigObject)
     {
         _chasingObject = chasigObject;
-        SetChasingState();
     }
 
     private void ResetCharacter()
     {
-        SetPatrolingState();
         _chasingObject = null;
-    }
-
-    private void SetPatrolingState()
-    {
-        _state = EnemyState.Patroling;
-    }
-
-    private void SetChasingState()
-    {
-        _state = EnemyState.Chasing;
-    }
-
-    private IEnumerator Reload()
-    {
-        yield return _waitForAttackReload;
-
-        _canAttack = true;
-    }
-
-    private void DecreaseHealth()
-    {
-        _health--;
     }
 
     private void Die()
     {
-        Destroy(gameObject);
+        OnHealthOver?.Invoke(this);
     }
 
     public void TakeDamage()
     {
-        DecreaseHealth();
+        _health.DecreaseHealth();
 
-        if (_health <= 0)
+        if (_health.CurrentHealth <= 0)
         {
             Die();
         }
