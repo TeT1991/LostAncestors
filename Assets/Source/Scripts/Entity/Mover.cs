@@ -4,16 +4,16 @@ using UnityEngine;
 public class Mover
 {
     private readonly Rigidbody2D _rigidbody2D;
+    private readonly float _speed;
     private int _direction;
-    private float _speed;
-
-    public event Action<int> OnDirecctionChanged;
 
     public Mover(Rigidbody2D rigidboy, float speed)
     {
         _rigidbody2D = rigidboy;
         _speed = speed;
     }
+
+    public event Action<int> OnDirecctionChanged;
 
     public void Move()
     {

@@ -1,7 +1,7 @@
 public enum ButtonType
 {
-    Walk_right,
-    Walk_left,
+    WalkRight,
+    WalkLeft,
     Jump,
     Attack
 }

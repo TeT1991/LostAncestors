@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8564984969085767488}
   - component: {fileID: 5963029812905367598}
   m_Layer: 10
-  m_Name: MedKit
+  m_Name: Coin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 3ba8d4e0c30e3b343aeebce171b823c0, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e00ef03fea26a744bb1598bf2dcda6a2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe0ba38bee5705d449bed743a3832b45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _pickableType: 0
+  _pickableType: 1
 --- !u!61 &5963029812905367598
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -135,7 +135,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2.69, y: 2.5}
+    oldSize: {x: 3, y: 3}
     newSize: {x: 3, y: 3}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

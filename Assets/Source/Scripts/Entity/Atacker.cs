@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Atacker
 {
-    private readonly MonoBehaviour _monoBehaviour;
+    private readonly ICoroutineRunner _coroutineRunner;
     private readonly Transform _projectileSpawnPoint;
     private readonly Projectile _projectilePrefab;
 
@@ -11,9 +11,9 @@ public class Atacker
     private WaitForSeconds _waitForAttackReload;
     private Coroutine _coroutine;
 
-    public Atacker(MonoBehaviour monoBehaviour, Transform projectileSpawnPoint, Projectile projectilePrefab, float reloadTime)
+    public Atacker(ICoroutineRunner coroutineRunner, Transform projectileSpawnPoint, Projectile projectilePrefab, float reloadTime)
     {
-        _monoBehaviour = monoBehaviour;
+        _coroutineRunner = coroutineRunner;
         _projectileSpawnPoint = projectileSpawnPoint;
         _projectilePrefab = projectilePrefab;
         _canAttack = true;
@@ -28,7 +28,7 @@ public class Atacker
             projectile.Init(speed, direction);
             projectile.transform.position = _projectileSpawnPoint.position;
             _canAttack = false;
-            _coroutine = _monoBehaviour.StartCoroutine(Reload());
+            _coroutine = _coroutineRunner.StartCoroutine(Reload());
         }
     }
 

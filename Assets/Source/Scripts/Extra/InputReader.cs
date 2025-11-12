@@ -24,8 +24,8 @@ public class InputReader : MonoBehaviour
     {
         _keys = new()
         {
-            { _moveRightButton, ButtonType.Walk_right },
-            { _moveLeftButton, ButtonType.Walk_left },
+            { _moveRightButton, ButtonType.WalkRight },
+            { _moveLeftButton, ButtonType.WalkLeft },
             { _jumpButton, ButtonType.Jump },
             { _attackButton, ButtonType.Attack },
         };

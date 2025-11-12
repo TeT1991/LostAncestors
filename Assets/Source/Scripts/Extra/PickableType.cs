@@ -1,4 +1,5 @@
 public enum PickableType
 {
-    Medkit
+    Medkit,
+    Coin
 }

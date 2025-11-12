@@ -4,7 +4,7 @@ using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class Enemy : MonoBehaviour, IDamagable
+public class Enemy : MonoBehaviour, IDamagable, ICoroutineRunner
 {
     [SerializeField] private HoleDetector _holeDetector;
     [SerializeField] private CharacterDetector _characterDetector;
@@ -23,7 +23,6 @@ public class Enemy : MonoBehaviour, IDamagable
     private Rotater _rotater;
     private Mover _mover;
     private AnimationSwitcher _animationSwitcher;
-    private Patroller _patroller;
     private Atacker _atacker;
     private Health _health;
 
@@ -76,7 +75,6 @@ public class Enemy : MonoBehaviour, IDamagable
         _mover = new(_rigidbody, _moveSpeed);
         _rotater = new(gameObject.transform);
         _animationSwitcher = new(_skeletonAnimation);
-        _patroller = new(_mover);
         _atacker = new(this,_projectileSpawnPoint, _projectilePrefab, _reloadTime);
         _health = new(_currentHealth, _currentHealth);
 

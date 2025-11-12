@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(InputReader), typeof(Rigidbody2D))]
-public class Character : MonoBehaviour, IDamagable
+public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
 {
     private readonly int _maxHealth = 3;
     private readonly int _startHealth = 1;
@@ -93,11 +93,11 @@ public class Character : MonoBehaviour, IDamagable
     {
         switch (buttonType)
         {
-            case ButtonType.Walk_right:
+            case ButtonType.WalkRight:
                 ApplyMoveActions(1);
                 break;
 
-            case ButtonType.Walk_left:
+            case ButtonType.WalkLeft:
                 ApplyMoveActions(-1);
                 break;
 
@@ -115,8 +115,8 @@ public class Character : MonoBehaviour, IDamagable
     {
         switch (buttonType)
         {
-            case ButtonType.Walk_right:
-            case ButtonType.Walk_left:
+            case ButtonType.WalkRight:
+            case ButtonType.WalkLeft:
                 StopMove();
                 break;
         }
@@ -131,6 +131,10 @@ public class Character : MonoBehaviour, IDamagable
                 Heal();
                 pickable.PickUp();
             }
+        }
+        else
+        {
+            pickable.PickUp();
         }
     }
 
