@@ -1,5 +1,6 @@
 using Spine.Unity;
 using Spine.Unity.Examples;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,8 +8,8 @@ using UnityEngine;
 [RequireComponent(typeof(InputReader), typeof(Rigidbody2D))]
 public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
 {
-    private readonly int _maxHealth = 3;
-    private readonly int _startHealth = 1;
+    private readonly float _maxHealth = 100;
+    private readonly float _currentHealth = 50;
 
     [SerializeField] private Projectile _projectilePrefab;
     [SerializeField] private Rigidbody2D _rigidBody;
@@ -41,6 +42,10 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
 
     private List<ButtonType> _commands;
 
+    public event Action<float> HealthChanged;
+
+    public Health Health => _health;
+
     private void Awake()
     {
         Init();
@@ -70,7 +75,7 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
         _animationSwitcher = new(_skeletonAnimation);
         _commands = new();
         _atacker = new(this,_projectileLaunchPoint, _projectilePrefab, _reloadTime);
-        _health = new(_startHealth, _maxHealth);
+        _health = new(_currentHealth, _maxHealth);
         _inputReader.Init();
 
         _direction = 1;
@@ -86,7 +91,6 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
         _waitForAttackReload = new WaitForSeconds(_reloadTime);
 
         AllowAttack();
-
     }
 
     private void StartExecuteAction(ButtonType buttonType)
@@ -222,6 +226,7 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
     private void Heal()
     {
         _health.IncreaseHealth();
+        HealthChanged?.Invoke(_currentHealth);
     }
 
     private void Die()
@@ -232,6 +237,7 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
     public void TakeDamage()
     {
         _health.DecreaseHealth();
+        HealthChanged?.Invoke(_currentHealth);
 
         if (_health.CurrentHealth <= 0)
         {

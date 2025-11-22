@@ -1,24 +1,30 @@
+using System;
+
 public class Health 
 {
-    private readonly int _maxHealth;
-    private int _currentHealth;
+    private readonly float _maxHealth;
+    private float _currentHealth;
 
-    public Health(int health, int maxHealth)
+    public event Action<float> HealthChanged;
+
+    public Health(float health, float maxHealth)
     {
         _currentHealth = health;
         _maxHealth = maxHealth;
     }
 
-    public int CurrentHealth => _currentHealth;
-    public int MaxHealth => _maxHealth;
+    public float CurrentHealth => _currentHealth;
+    public float MaxHealth => _maxHealth;
 
     public void IncreaseHealth()
     {
         _currentHealth++;
+        HealthChanged?.Invoke(_currentHealth);
     }
 
     public void DecreaseHealth()
     {
         _currentHealth--;
+        HealthChanged?.Invoke(_currentHealth);
     }
 }
