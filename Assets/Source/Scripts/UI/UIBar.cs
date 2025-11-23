@@ -66,7 +66,7 @@ public class UIBar : MonoBehaviour
         float distance = CalculateDistance(_image.fillAmount, _currentValue);
         _step = CalculateStep(distance, _animationTime);
 
-        if(_coroutine != null)
+        if (_coroutine != null)
         {
             StopCoroutine(_coroutine);
         }
