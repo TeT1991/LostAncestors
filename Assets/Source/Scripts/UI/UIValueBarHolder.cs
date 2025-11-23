@@ -21,6 +21,12 @@ public class UIValueBarHolder : MonoBehaviour
 
     private void Awake()
     {
+        Init();
+    }
+
+    private void Init()
+    {
+        SetText(_currentCountValue.ToString());
         _foregroundBar.Init(CalculateFillnesPercent());
         _backgroundBar.Init(CalculateFillnesPercent());
     }
@@ -35,6 +41,7 @@ public class UIValueBarHolder : MonoBehaviour
         }
         _currentCountValue = newValue;
 
+        SetText(_currentCountValue.ToString());
         _foregroundBar.ChageValues(CalculateFillnesPercent(), _foregroundBarColor, _foregroundBarDelay, _foregroundBarAnimationTime);
         _backgroundBar.ChageValues(CalculateFillnesPercent(), _backgroundBarDecreaseColor, _backgroundBarDelay, _backgroundBarAnimationTime);
     }
@@ -49,6 +56,7 @@ public class UIValueBarHolder : MonoBehaviour
         }
         _currentCountValue = newValue;
 
+        SetText(_currentCountValue.ToString());
         _foregroundBar.ChageValues(CalculateFillnesPercent(), _foregroundBarColor, _backgroundBarDelay, _backgroundBarAnimationTime);
         _backgroundBar.ChageValues(CalculateFillnesPercent(), _backgroundBarIncreaseColor, _foregroundBarDelay, _foregroundBarAnimationTime);
     }
@@ -56,5 +64,11 @@ public class UIValueBarHolder : MonoBehaviour
     private float CalculateFillnesPercent()
     {
         return Mathf.Clamp(_currentCountValue / _maxCountValue, 0f, 1f);
+    }
+
+    private void SetText(string text)
+    {
+        string template = text + "/" + _maxCountValue;
+        _countText.text = template;
     }
 }
