@@ -11,7 +11,6 @@ public class UIBar : MonoBehaviour
     private float _animationTime;
     private bool _isAnimating = false;
     private float _currentValue;
-    private float _maxValue;
     private float _step;
     private Image _image;
     private Coroutine _coroutine;
@@ -31,17 +30,26 @@ public class UIBar : MonoBehaviour
         _image.fillAmount = _currentValue;
     }
 
-    public void SetDelay(float delay)
+    public void ChageValues(float value, Color color, float delay, float animationTime)
     {
+        _currentValue = Mathf.Clamp01(value);
+        _image.color = color;
         _delay = delay;
+        float minAnimationTime = 0.0001f;
+        _animationTime = Mathf.Max(minAnimationTime,animationTime);
+
+        float distance = CalculateDistance(_image.fillAmount, _currentValue);
+        _step = CalculateStep(distance, _animationTime);
+
+        if (_coroutine != null)
+        {
+            StopCoroutine(_coroutine);
+        }
+
+        _coroutine = StartCoroutine(DelayAnimation());
     }
 
-    public void SetAnimationTime(float animationTime)
-    {
-        _animationTime = animationTime;
-    }
-
-    public void SetFilness()
+    private void SetFilness()
     {
         _image.fillAmount = Mathf.Clamp01(Mathf.MoveTowards(_image.fillAmount, _currentValue, _step * Time.deltaTime));
 
@@ -54,24 +62,6 @@ public class UIBar : MonoBehaviour
                 StopCoroutine(_coroutine);
             }
         }
-    }
-
-    public void ChageValues(float value, Color color, float delay, float animationTime)
-    {
-        _currentValue = value;
-        _image.color = color;
-        _delay = delay;
-        _animationTime = animationTime;
-
-        float distance = CalculateDistance(_image.fillAmount, _currentValue);
-        _step = CalculateStep(distance, _animationTime);
-
-        if (_coroutine != null)
-        {
-            StopCoroutine(_coroutine);
-        }
-
-        _coroutine = StartCoroutine(DelayAnimation());
     }
 
     private IEnumerator DelayAnimation()
@@ -93,5 +83,3 @@ public class UIBar : MonoBehaviour
         return distance / animationTime;
     }
 }
-
-
