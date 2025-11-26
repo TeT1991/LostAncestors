@@ -16,15 +16,15 @@ public class Health
     public float CurrentHealth => _currentHealth;
     public float MaxHealth => _maxHealth;
 
-    public void IncreaseHealth()
+    public void IncreaseHealth(float value)
     {
-        _currentHealth++;
+        _currentHealth =  _currentHealth + value > _maxHealth ? _maxHealth : _currentHealth + value;
         HealthChanged?.Invoke(_currentHealth);
     }
 
-    public void DecreaseHealth()
+    public void DecreaseHealth(float value)
     {
-        _currentHealth--;
+        _currentHealth = _currentHealth - value < 0 ? 0 : _currentHealth - value;
         HealthChanged?.Invoke(_currentHealth);
     }
 }

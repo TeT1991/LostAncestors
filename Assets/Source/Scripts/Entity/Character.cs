@@ -18,11 +18,14 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
     [SerializeField] private GroundDetector _groundDetector;
     [SerializeField] private PickableDetector _pickableDetector;
     [SerializeField] private Transform _projectileLaunchPoint;
+    [SerializeField] private UIValueBarsHolder _healthBar;
 
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _jumpPower;
     [SerializeField] private float _reloadTime;
     [SerializeField] private float _projectileSpeed;
+
+    private float _incomingHealPower = 10;
 
     private WaitForSeconds _waitForAttackReload;
     private Coroutine _coroutine;
@@ -60,6 +63,7 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
         _groundDetector.OnGroundNotDetected -= DenyJump;
 
         _pickableDetector.OnPicked -= TryPickUp;
+        HealthChanged -= _healthBar.ChangeValue;
     }
 
     private void FixedUpdate()
@@ -77,6 +81,7 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
         _atacker = new(this,_projectileLaunchPoint, _projectilePrefab, _reloadTime);
         _health = new(_currentHealth, _maxHealth);
         _inputReader.Init();
+        _healthBar.Init(_currentHealth, _maxHealth);
 
         _direction = 1;
 
@@ -87,6 +92,8 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
         _groundDetector.OnGroundNotDetected += DenyJump;
 
         _pickableDetector.OnPicked += TryPickUp;
+
+        HealthChanged += _healthBar.ChangeValue;
 
         _waitForAttackReload = new WaitForSeconds(_reloadTime);
 
@@ -225,8 +232,8 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
 
     private void Heal()
     {
-        _health.IncreaseHealth();
-        HealthChanged?.Invoke(_currentHealth);
+        _health.IncreaseHealth(_incomingHealPower);
+        HealthChanged?.Invoke(_health.CurrentHealth);
     }
 
     private void Die()
@@ -234,10 +241,10 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
         Destroy(gameObject);
     }
 
-    public void TakeDamage()
+    public void TakeDamage(float value)
     {
-        _health.DecreaseHealth();
-        HealthChanged?.Invoke(_currentHealth);
+        _health.DecreaseHealth(value);
+        HealthChanged?.Invoke(_health.CurrentHealth);
 
         if (_health.CurrentHealth <= 0)
         {

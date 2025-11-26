@@ -9,6 +9,7 @@ public class Enemy : MonoBehaviour, IDamagable, ICoroutineRunner
     [SerializeField] private HoleDetector _holeDetector;
     [SerializeField] private CharacterDetector _characterDetector;
     [SerializeField] private SkeletonAnimation _skeletonAnimation;
+    [SerializeField] private UIValueBarsHolder _healthBar;
 
     [SerializeField] private Projectile _projectilePrefab;
     [SerializeField] private Transform _projectileSpawnPoint;
@@ -30,11 +31,12 @@ public class Enemy : MonoBehaviour, IDamagable, ICoroutineRunner
     private WaitForSeconds _waitForAttackReload;
 
     private int _direction;
-    private int _currentHealth = 1;
+    private int _currentHealth = 30;
     private bool _canMove;
     private bool _canAttack;
 
-    public event Action<Enemy> OnHealthOver;
+    public event Action<Enemy> HealthOver;
+    public event Action<float> HealthChanged;
 
     private void Awake()
     {
@@ -51,6 +53,7 @@ public class Enemy : MonoBehaviour, IDamagable, ICoroutineRunner
         _holeDetector.OnHoleDetected -= SwitchDirection;
         _characterDetector.OnDetected -= SetChasingObject;
         _characterDetector.OnNotDetected -= ResetCharacter;
+        HealthChanged -= _healthBar.ChangeValue;
     }
 
     private void SelectAction()
@@ -77,10 +80,12 @@ public class Enemy : MonoBehaviour, IDamagable, ICoroutineRunner
         _animationSwitcher = new(_skeletonAnimation);
         _atacker = new(this,_projectileSpawnPoint, _projectilePrefab, _reloadTime);
         _health = new(_currentHealth, _currentHealth);
+        _healthBar.Init(_health.CurrentHealth, _health.MaxHealth);
 
         _holeDetector.OnHoleDetected += SwitchDirection;
         _characterDetector.OnDetected += SetChasingObject;
         _characterDetector.OnNotDetected += ResetCharacter;
+        HealthChanged += _healthBar.ChangeValue;
         _rotater.Rotate(_direction);
         _mover.SetDirection(_direction);
         _characterDetector.Init(_attackDistance);
@@ -119,12 +124,13 @@ public class Enemy : MonoBehaviour, IDamagable, ICoroutineRunner
 
     private void Die()
     {
-        OnHealthOver?.Invoke(this);
+        HealthOver?.Invoke(this);
     }
 
-    public void TakeDamage()
+    public void TakeDamage(float damage)
     {
-        _health.DecreaseHealth();
+        _health.DecreaseHealth(damage);
+        HealthChanged?.Invoke(_health.CurrentHealth);
 
         if (_health.CurrentHealth <= 0)
         {

@@ -15,7 +15,7 @@ public class EnemySpawner : MonoBehaviour
     {
         foreach (Enemy enemy in _enemies)
         {
-            enemy.OnHealthOver -= Destroy;
+            enemy.HealthOver -= Destroy;
         }
     }
 
@@ -23,13 +23,13 @@ public class EnemySpawner : MonoBehaviour
     {
         foreach (Enemy enemy in _enemies)
         {
-            enemy.OnHealthOver += Destroy;
+            enemy.HealthOver += Destroy;
         }
     }
 
     private void Destroy(Enemy enemy)
     {
-        enemy.OnHealthOver -= Destroy;
+        enemy.HealthOver -= Destroy;
         Destroy(enemy.gameObject);
     }
 }

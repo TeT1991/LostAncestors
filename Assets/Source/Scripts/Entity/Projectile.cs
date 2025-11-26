@@ -6,6 +6,7 @@ public class Projectile : MonoBehaviour
     private float _speed;
     private float _direction;
     private float _moveDistance;
+    private float _damage = 10;
 
     private void Update()
     {
@@ -16,7 +17,7 @@ public class Projectile : MonoBehaviour
     {
         if (collision.TryGetComponent(out IDamagable damagable))
         {
-            damagable.TakeDamage();
+            damagable.TakeDamage(_damage);
             Destroy(gameObject);
         }
 
