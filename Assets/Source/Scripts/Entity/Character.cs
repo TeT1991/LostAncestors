@@ -8,9 +8,6 @@ using UnityEngine;
 [RequireComponent(typeof(InputReader), typeof(Rigidbody2D))]
 public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
 {
-    private readonly float _maxHealth = 100;
-    private readonly float _currentHealth = 50;
-
     [SerializeField] private Projectile _projectilePrefab;
     [SerializeField] private Rigidbody2D _rigidBody;
     [SerializeField] private InputReader _inputReader;
@@ -45,8 +42,6 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
 
     private List<ButtonType> _commands;
 
-    public event Action<float> HealthChanged;
-
     public Health Health => _health;
 
     private void Awake()
@@ -56,14 +51,14 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
 
     private void OnDestroy()
     {
-        _inputReader.OnButtonPressed -= StartExecuteAction;
-        _inputReader.OnButtonReleased -= StopExecuteAction;
+        _inputReader.ButtonPressed -= StartExecuteAction;
+        _inputReader.ButtonReleased -= StopExecuteAction;
 
-        _groundDetector.OnGroundDetected -= AllowJump;
-        _groundDetector.OnGroundNotDetected -= DenyJump;
+        _groundDetector.GroundDetected -= AllowJump;
+        _groundDetector.GroundNotDetected -= DenyJump;
 
-        _pickableDetector.OnPicked -= TryPickUp;
-        HealthChanged -= _healthBar.ChangeValue;
+        _pickableDetector.Picked -= TryPickUp;
+        _health.HealthChanged -= _healthBar.ChangeValue;
     }
 
     private void FixedUpdate()
@@ -73,27 +68,30 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
 
     private void Init()
     {
+        float currentHealth = 50;
+        float maxHealth = 100;
+
         _mover = new(_rigidBody, _moveSpeed);
         _jumper = new(_rigidBody, _jumpPower);
         _rotater = new(gameObject.transform);
         _animationSwitcher = new(_skeletonAnimation);
         _commands = new();
         _atacker = new(this,_projectileLaunchPoint, _projectilePrefab, _reloadTime);
-        _health = new(_currentHealth, _maxHealth);
+        _health = new(currentHealth, maxHealth);
         _inputReader.Init();
-        _healthBar.Init(_currentHealth, _maxHealth);
+        _healthBar.Init(_health.CurrentHealth, _health.MaxHealth);
 
         _direction = 1;
 
-        _inputReader.OnButtonPressed += StartExecuteAction;
-        _inputReader.OnButtonReleased += StopExecuteAction;
+        _inputReader.ButtonPressed += StartExecuteAction;
+        _inputReader.ButtonReleased += StopExecuteAction;
 
-        _groundDetector.OnGroundDetected += AllowJump;
-        _groundDetector.OnGroundNotDetected += DenyJump;
+        _groundDetector.GroundDetected += AllowJump;
+        _groundDetector.GroundNotDetected += DenyJump;
 
-        _pickableDetector.OnPicked += TryPickUp;
+        _pickableDetector.Picked += TryPickUp;
 
-        HealthChanged += _healthBar.ChangeValue;
+        _health.HealthChanged += _healthBar.ChangeValue;
 
         _waitForAttackReload = new WaitForSeconds(_reloadTime);
 
@@ -233,7 +231,6 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
     private void Heal()
     {
         _health.IncreaseHealth(_incomingHealPower);
-        HealthChanged?.Invoke(_health.CurrentHealth);
     }
 
     private void Die()
@@ -244,7 +241,6 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
     public void TakeDamage(float value)
     {
         _health.DecreaseHealth(value);
-        HealthChanged?.Invoke(_health.CurrentHealth);
 
         if (_health.CurrentHealth <= 0)
         {

@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class PickableDetector : MonoBehaviour
 {
-    public event Action<IPickable> OnPicked;
+    public event Action<IPickable> Picked;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if(collision.TryGetComponent(out IPickable pickable))
         {
-            OnPicked?.Invoke(pickable);
+            Picked?.Invoke(pickable);
         }
     }
 }

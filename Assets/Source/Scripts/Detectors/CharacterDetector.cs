@@ -8,8 +8,8 @@ public class CharacterDetector : MonoBehaviour
 
     private Transform _lastDetectedObject = null;
 
-    public event Action<Transform> OnDetected;
-    public event Action OnNotDetected;
+    public event Action<Transform> Detected;
+    public event Action NotDetected;
 
     private void Update()
     {
@@ -34,7 +34,7 @@ public class CharacterDetector : MonoBehaviour
         {
             if (_lastDetectedObject != hit.collider.transform)
             {
-                OnDetected?.Invoke(hit.collider.transform);
+                Detected?.Invoke(hit.collider.transform);
             }
             _lastDetectedObject = hit.collider.transform;
         }
@@ -42,7 +42,7 @@ public class CharacterDetector : MonoBehaviour
         {
             if (_lastDetectedObject != null)
             {
-                OnNotDetected?.Invoke();
+                NotDetected?.Invoke();
                 _lastDetectedObject = null;
             }
         }

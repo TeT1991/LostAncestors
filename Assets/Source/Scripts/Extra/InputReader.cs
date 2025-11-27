@@ -11,8 +11,8 @@ public class InputReader : MonoBehaviour
 
     private Dictionary<KeyCode, ButtonType> _keys;
 
-    public event Action<ButtonType> OnButtonPressed;
-    public event Action<ButtonType> OnButtonReleased;
+    public event Action<ButtonType> ButtonPressed;
+    public event Action<ButtonType> ButtonReleased;
 
     private void Update()
     {
@@ -39,7 +39,7 @@ public class InputReader : MonoBehaviour
             {
                 if (_keys.TryGetValue(key, out ButtonType buttonType))
                 {
-                    OnButtonPressed?.Invoke(buttonType);
+                    ButtonPressed?.Invoke(buttonType);
                 }
             }
         }
@@ -53,7 +53,7 @@ public class InputReader : MonoBehaviour
             {
                 if (_keys.TryGetValue(key, out ButtonType buttonType))
                 {
-                    OnButtonReleased?.Invoke(buttonType);
+                    ButtonReleased?.Invoke(buttonType);
                 }
             }
         }

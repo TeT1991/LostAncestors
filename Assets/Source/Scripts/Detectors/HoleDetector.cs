@@ -9,7 +9,7 @@ public class HoleDetector : MonoBehaviour
     private readonly float _checkDistance = 1f;
     private bool _wasHoleDetectedLastFrame = false;
 
-    public event Action OnHoleDetected;
+    public event Action HoleDetected;
 
     private void Update()
     {
@@ -25,7 +25,7 @@ public class HoleDetector : MonoBehaviour
 
         if (isHoleDetectedCurrently && _wasHoleDetectedLastFrame == false)
         {
-            OnHoleDetected?.Invoke();
+            HoleDetected?.Invoke();
         }
 
         _wasHoleDetectedLastFrame = isHoleDetectedCurrently;

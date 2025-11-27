@@ -5,8 +5,8 @@ public class GroundDetector : MonoBehaviour
 {
     private int _collisionsCount = 0;
 
-    public event Action OnGroundDetected;
-    public event Action OnGroundNotDetected;
+    public event Action GroundDetected;
+    public event Action GroundNotDetected;
 
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -14,7 +14,7 @@ public class GroundDetector : MonoBehaviour
         if (collision.TryGetComponent<Platform>(out _))
         {
             _collisionsCount++;
-            OnGroundDetected?.Invoke();
+            GroundDetected?.Invoke();
         }
     }
 
@@ -27,7 +27,7 @@ public class GroundDetector : MonoBehaviour
             if (_collisionsCount <= 0)
             {
                 _collisionsCount = 0;
-                OnGroundNotDetected?.Invoke();
+                GroundNotDetected?.Invoke();
             }
         }
     }
