@@ -8,16 +8,21 @@ public class InputReader : MonoBehaviour
     private readonly KeyCode _moveRightButton = KeyCode.D;
     private readonly KeyCode _jumpButton = KeyCode.Space;
     private readonly KeyCode _attackButton = KeyCode.Mouse0;
+    private readonly KeyCode _firstSkillButton = KeyCode.Alpha1;
 
     private Dictionary<KeyCode, ButtonType> _keys;
+    private bool _isDetecting = false;
 
     public event Action<ButtonType> ButtonPressed;
     public event Action<ButtonType> ButtonReleased;
 
     private void Update()
     {
-        DetectButtonPress();
-        DetectButtonRelease();
+        if (_isDetecting)
+        {
+            DetectButtonPress();
+            DetectButtonRelease();
+        }
     }
 
     public void Init()
@@ -28,7 +33,10 @@ public class InputReader : MonoBehaviour
             { _moveLeftButton, ButtonType.WalkLeft },
             { _jumpButton, ButtonType.Jump },
             { _attackButton, ButtonType.Attack },
+            { _firstSkillButton, ButtonType.FirstSkill },
         };
+
+        _isDetecting = true;
     }
 
     private void DetectButtonPress()

@@ -18,11 +18,15 @@ public class UIValueBarsHolder : MonoBehaviour
         _dynamicBar.Init(CalculateFillnesPercent());
     }
 
+    public void SetMaxValue(float value)
+    {
+        _numericBar.SetMaxValue(value);
+        _dynamicBar.SetMaxValue(value);
+    }
+
     public void ChangeValue(float value)
     {
         float newValue = Mathf.Clamp(value, 0, _maxCountValue);
-        Debug.Log(_currentCountValue);
-        Debug.Log(newValue);
 
         if (newValue == _currentCountValue)
         {

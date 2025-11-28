@@ -14,8 +14,10 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
     [SerializeField] private SkeletonAnimation _skeletonAnimation;
     [SerializeField] private GroundDetector _groundDetector;
     [SerializeField] private PickableDetector _pickableDetector;
+    [SerializeField] private EnemyDetector _enemyDetector;
     [SerializeField] private Transform _projectileLaunchPoint;
     [SerializeField] private UIValueBarsHolder _healthBar;
+    [SerializeField] private UIValueBarsHolder _vampirismhBar;
 
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _jumpPower;
@@ -33,6 +35,8 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
     private Atacker _atacker;
     private Health _health;
     private AnimationSwitcher _animationSwitcher;
+    private List<Skill> _skills;
+    private Skill _currentSkill;
 
     private int _direction;
 
@@ -59,6 +63,9 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
 
         _pickableDetector.Picked -= TryPickUp;
         _health.HealthChanged -= _healthBar.ChangeValue;
+
+        _enemyDetector.Detected -= _skills[0].AddTarget;
+        _enemyDetector.NotDetected -= _skills[0].RemoveTarget;
     }
 
     private void FixedUpdate()
@@ -80,6 +87,10 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
         _health = new(currentHealth, maxHealth);
         _inputReader.Init();
         _healthBar.Init(_health.CurrentHealth, _health.MaxHealth);
+        _skills = new()
+        {
+            new Vampirism(this,this, _vampirismhBar)
+        };
 
         _direction = 1;
 
@@ -92,6 +103,9 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
         _pickableDetector.Picked += TryPickUp;
 
         _health.HealthChanged += _healthBar.ChangeValue;
+
+        _enemyDetector.Detected += _skills[0].AddTarget;
+        _enemyDetector.NotDetected += _skills[0].RemoveTarget;
 
         _waitForAttackReload = new WaitForSeconds(_reloadTime);
 
@@ -117,6 +131,10 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
             case ButtonType.Attack:
                 Attack();
                 break;
+
+                case ButtonType.FirstSkill:
+                SelectSkill(_skills[0]);
+                break;
         }
     }
 
@@ -127,6 +145,10 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
             case ButtonType.WalkRight:
             case ButtonType.WalkLeft:
                 StopMove();
+                break;
+
+            case ButtonType.FirstSkill:
+                StopUseSkill();
                 break;
         }
     }
@@ -145,6 +167,26 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
         {
             pickable.PickUp();
         }
+    }
+
+    private void SelectSkill(Skill skill)
+    {
+        _currentSkill = skill;
+
+        if (skill.IsActivated == false && skill.IsReadyForUse)
+        {
+            UseSkill();
+        }
+    }
+
+    private void UseSkill()
+    {
+        _currentSkill.Activate();
+    }
+
+    private void StopUseSkill()
+    {
+        _currentSkill.Deactivate();
     }
 
     private void ApplyMoveActions(int direction)

@@ -1,6 +1,7 @@
 using Spine.Unity;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -52,6 +53,16 @@ public class Enemy : MonoBehaviour, IDamagable, ICoroutineRunner
         _characterDetector.Detected -= SetChasingObject;
         _characterDetector.NotDetected -= ResetCharacter;
         _health.HealthChanged -= _healthBar.ChangeValue;
+    }
+
+    public void TakeDamage(float damage)
+    {
+        _health.DecreaseHealth(damage);
+
+        if (_health.CurrentHealth <= 0)
+        {
+            Die();
+        }
     }
 
     private void SelectAction()
@@ -125,15 +136,5 @@ public class Enemy : MonoBehaviour, IDamagable, ICoroutineRunner
     private void Die()
     {
         HealthOver?.Invoke(this);
-    }
-
-    public void TakeDamage(float damage)
-    {
-        _health.DecreaseHealth(damage);
-
-        if (_health.CurrentHealth <= 0)
-        {
-            Die();
-        }
     }
 }
