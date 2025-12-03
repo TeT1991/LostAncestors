@@ -17,7 +17,7 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
     [SerializeField] private EnemyDetector _enemyDetector;
     [SerializeField] private Transform _projectileLaunchPoint;
     [SerializeField] private UIValueBarsHolder _healthBar;
-    [SerializeField] private UIValueBarsHolder _vampirismhBar;
+    [SerializeField] private SkillPresenter _skillPresenter;
 
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _jumpPower;
@@ -89,8 +89,10 @@ public class Character : MonoBehaviour, IDamagable, ICoroutineRunner
         _healthBar.Init(_health.CurrentHealth, _health.MaxHealth);
         _skills = new()
         {
-            new Vampirism(this,this, _vampirismhBar)
+            new Vampirism(this)
         };
+
+        _skillPresenter.Init(_skills[0]);
 
         _direction = 1;
 

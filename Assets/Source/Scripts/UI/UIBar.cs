@@ -14,6 +14,7 @@ public class UIBar : MonoBehaviour
     public void SetMaxValue(float value)
     {
         MaxValue = value;
+        Debug.Log(MaxValue);
     }
 
     public virtual void ChangeValues(float value) { }

@@ -1,6 +1,6 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Skill
@@ -17,8 +17,12 @@ public class Skill
     protected float _reloadTime = 4f;
     protected float _duration = 6f;
 
+    public event Action<float> ProgreesChanged;
+    public event Action<float> ReloadStarted;
+    public event Action Reloaded;
+    public event Action<float> Used;
 
-    public Skill(Character character, ICoroutineRunner coroutineRunner)
+    public Skill(Character character)
     {
         ResetTargets();
         _waitForReload = new(_reloadTime);
@@ -29,13 +33,22 @@ public class Skill
     public bool IsActivated => _isActivated;
     public bool IsReadyForUse => _isReadyForUse;
 
+    public float Duration => _duration;
+
     public virtual void Activate()
     {
         if (_isReadyForUse)
         {
             _isActivated = true;
+
+            if (_coroutine != null)
+            {
+                _coroutineRunner.StopCoroutine(_coroutine);
+            }
+
             _coroutine = _coroutineRunner.StartCoroutine(Use());
             _isReadyForUse = false;
+            Used?.Invoke(_duration);
         }
     }
 
@@ -44,6 +57,12 @@ public class Skill
         if (_isActivated)
         {
             _isActivated = false;
+
+            if (_coroutine != null)
+            {
+                _coroutineRunner.StopCoroutine(_coroutine);
+            }
+
             _coroutineRunner.StopCoroutine(_coroutine);
             _coroutine = _coroutineRunner.StartCoroutine(Reload());
         }
@@ -76,5 +95,25 @@ public class Skill
     public virtual IEnumerator Use()
     {
         yield return _waitForTick;
+    }
+
+    protected void NotifyUsed(float value)
+    {
+        Used?.Invoke(value);
+    }
+
+    protected void NotifyReloaded()
+    {
+        Reloaded?.Invoke();
+    }
+
+    protected void NotifyProgressStatus(float value)
+    {
+        ProgreesChanged?.Invoke(value);
+    }
+
+    protected void NotifyReloadStarted(float value)
+    {
+        ReloadStarted?.Invoke(value);
     }
 }

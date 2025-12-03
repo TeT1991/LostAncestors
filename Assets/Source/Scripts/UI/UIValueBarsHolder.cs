@@ -20,8 +20,9 @@ public class UIValueBarsHolder : MonoBehaviour
 
     public void SetMaxValue(float value)
     {
-        _numericBar.SetMaxValue(value);
-        _dynamicBar.SetMaxValue(value);
+        _maxCountValue = value;
+        _numericBar.SetMaxValue(_maxCountValue);
+        _dynamicBar.SetMaxValue(_maxCountValue);
     }
 
     public void ChangeValue(float value)
@@ -32,7 +33,6 @@ public class UIValueBarsHolder : MonoBehaviour
         {
             return;
         }
-
 
         _currentCountValue = newValue;
         _numericBar.ChangeValues(_currentCountValue);
